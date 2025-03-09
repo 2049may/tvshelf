@@ -1,9 +1,13 @@
 package com.pirrera.tvshelf
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,76 +27,85 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
+import com.ramcosta.composedestinations.DestinationsNavHost
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             TVshelfTheme {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize().background(Color(0xff212529)),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xff212529)),
                     bottomBar = {
                         BottomAppBar(
                             containerColor = Color(0xFF2D3339),
                             tonalElevation = 8.dp,
                             actions = {
-                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                                    IconButton(onClick = { /* do something */ }) {
-                                        Icon(Icons.Filled.Check, contentDescription = "Localized description")
-                                    }
-                                    IconButton(onClick = { /* do something */ }) {
-                                        Icon(
-                                            Icons.Filled.Edit,
-                                            contentDescription = "Localized description",
-                                        )
-                                    }
-                                    IconButton(onClick = { /* do something */ }) {
-                                        Icon(
-                                            Icons.Filled.Edit,
-                                            contentDescription = "Localized description",
-                                        )
-                                    }
+                                var selectedIcon by remember { mutableStateOf<String?>(null) }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    BottomAppBarButton("home", isSelected = selectedIcon == "home", onIconClick = { selectedIcon = "home" })
+                                    BottomAppBarButton("search", isSelected = selectedIcon == "search", onIconClick = { selectedIcon = "search" })
+                                    BottomAppBarButton("profile", isSelected = selectedIcon == "profile", onIconClick = { selectedIcon = "profile" })
+
                                 }
 
                             },
 
 
-                        )
+                            )
                     },
-                ) { innerPadding ->
-                    Text(
-                        modifier = Modifier.padding(innerPadding),
-                        text = "Example of a scaffold with a bottom app bar."
-                    )
+                ) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color(0xff212529))
                     ) {
+                    }
                 }
-            }}
+            }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun BottomAppBarButton(
+    iconName: String,
+    isSelected: Boolean,
+    onIconClick: () -> Unit
+) {
+    val id = when (iconName) {
+        "search" -> R.drawable.glass
+        "profile" -> R.drawable.profile
+        "home" -> R.drawable.home
+        else -> R.drawable.glass // TODO(): default à modifier
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TVshelfTheme {
-        Greeting("Android")
+    IconButton(onClick = onIconClick) {
+        Image(
+            painter = painterResource(id = id),
+            contentDescription = iconName,
+            modifier = Modifier
+                .height(30.dp)
+                .alpha(if (isSelected) 0.5f else 1f)
+        )
     }
 }
