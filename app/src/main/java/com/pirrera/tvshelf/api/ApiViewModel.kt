@@ -17,10 +17,85 @@ class ApiViewModel: ViewModel() {
     fun fetchSeries(){
         viewModelScope.launch{
             try{
-                val apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMzJjMjI5NGQzMDI2ZGFhOWE4MjczZDljNjI0YzRkOCIsIm5iZiI6MTc0MTM0MjAyMC43MDU5OTk5LCJzdWIiOiI2N2NhYzU0NDMwZjQ0NDRjNmIyYjUyYmUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.f9qcNl_3s4m01OIHGIMBrAosiboTjUDYx_Z6sJlhzhI"
                 val response = RetrofitInstance.api.getSeries()
+
                 _series.value = response.results
             }catch (e:Exception){
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
+
+    private val _seriesAction: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val seriesAction: StateFlow<List<Series>> = _seriesAction.asStateFlow()
+
+    fun fetchSeriesByAction(){
+        viewModelScope.launch{
+            try{
+                val response = RetrofitInstance.api.getSeriesByAction()
+
+                _seriesAction.value = response.results
+            }catch (e:Exception){
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
+
+    private val _seriesFictionFantasy: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val seriesFictionFantasy: StateFlow<List<Series>> = _seriesFictionFantasy.asStateFlow()
+
+    fun fetchSeriesByFictionFantasy(){
+        viewModelScope.launch{
+            try{
+                val response = RetrofitInstance.api.getSeriesByFictionFantasy()
+
+                _seriesFictionFantasy.value = response.results
+            }catch (e:Exception){
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
+
+    private val _seriesCrime: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val seriesCrime: StateFlow<List<Series>> = _seriesCrime.asStateFlow()
+
+    fun fetchSeriesByCrime(){
+        viewModelScope.launch{
+            try{
+                val response = RetrofitInstance.api.getSeriesByCrime()
+
+                _seriesCrime.value = response.results
+            }catch (e:Exception){
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
+
+    private val _seriesComedy: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val seriesComedy: StateFlow<List<Series>> = _seriesComedy.asStateFlow()
+
+    fun fetchSeriesByComedy() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getSeriesByComedy()
+
+                _seriesComedy.value = response.results
+            } catch (e: Exception) {
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
+
+    private val _seriesDrama: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val seriesDrama: StateFlow<List<Series>> = _seriesDrama.asStateFlow()
+
+    fun fetchSeriesByDrama() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getSeriesByDrama()
+
+                _seriesDrama.value = response.results
+            } catch (e: Exception) {
                 Log.e("Api error", e.localizedMessage ?: "")
             }
         }

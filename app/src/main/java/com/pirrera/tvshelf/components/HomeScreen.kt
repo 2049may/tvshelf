@@ -33,9 +33,19 @@ import com.pirrera.tvshelf.api.ApiViewModel
 @Composable
 fun HomeScreen(viewModel: ApiViewModel = viewModel()){
     val seriesList by viewModel.series.collectAsState()
+    val actionAdventureList by viewModel.seriesAction.collectAsState()
+    val fictionFantasyList by viewModel.seriesFictionFantasy.collectAsState()
+    val crimeList by viewModel.seriesCrime.collectAsState()
+    val comedyList by viewModel.seriesComedy.collectAsState()
+    val dramaList by viewModel.seriesDrama.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchSeries()
+        viewModel.fetchSeriesByAction()
+        viewModel.fetchSeriesByFictionFantasy()
+        viewModel.fetchSeriesByCrime()
+        viewModel.fetchSeriesByComedy()
+        viewModel.fetchSeriesByDrama()
     }
 
 
@@ -43,12 +53,12 @@ fun HomeScreen(viewModel: ApiViewModel = viewModel()){
         .fillMaxSize().
         verticalScroll(rememberScrollState())){
         Box(modifier = Modifier.padding(top = 40.dp)) {
-            Text("Fantastic", color = Color(0xFFB8C5D6))
+            Text("Action", color = Color(0xFFB8C5D6))
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(seriesList) { series ->
+                    items(actionAdventureList) { series ->
                         AsyncImage(
                             model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                             contentDescription = null,
@@ -68,7 +78,7 @@ fun HomeScreen(viewModel: ApiViewModel = viewModel()){
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(seriesList) { series ->
+                items(fictionFantasyList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
@@ -80,12 +90,12 @@ fun HomeScreen(viewModel: ApiViewModel = viewModel()){
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Thriller", color = Color(0xFFB8C5D6))
+            Text("Crime", color = Color(0xFFB8C5D6))
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(seriesList) { series ->
+                items(crimeList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
@@ -97,12 +107,12 @@ fun HomeScreen(viewModel: ApiViewModel = viewModel()){
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Action", color = Color(0xFFB8C5D6))
+            Text("Comedy", color = Color(0xFFB8C5D6))
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(seriesList) { series ->
+                items(comedyList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
@@ -119,7 +129,7 @@ fun HomeScreen(viewModel: ApiViewModel = viewModel()){
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(seriesList) { series ->
+                items(dramaList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
