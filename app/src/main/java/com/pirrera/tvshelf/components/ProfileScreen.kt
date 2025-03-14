@@ -1,0 +1,241 @@
+package com.pirrera.tvshelf.components
+
+import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.pirrera.tvshelf.R
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun ProfileScreen() {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
+
+        User()
+        HorizontalDivider(
+            color = Color(0xFFB8C5D6),
+            thickness = 1.dp,
+        )
+
+        FavoriteShows()
+        HorizontalDivider(
+            color = Color(0xFFB8C5D6),
+            thickness = 1.dp,
+            modifier = Modifier.padding(vertical = 10.dp)
+        )
+
+        CurrentlyWatching()
+        HorizontalDivider(
+            color = Color(0xFFB8C5D6),
+            thickness = 1.dp,
+            modifier = Modifier.padding(vertical = 10.dp)
+        )
+
+        Statistics()
+
+    }
+}
+
+@Composable
+fun User() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 15.dp),
+        horizontalArrangement = Arrangement.Absolute.Left,
+    ) {
+        Image(
+            painter = painterResource(R.drawable.default_pfp),
+            contentDescription = "User profile picture",
+            modifier = Modifier
+                .clip(CircleShape)
+                .size(70.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(horizontal = 10.dp)
+        ) {
+            Text(
+                text = "Pseudo",
+                color = Color.White,
+                fontSize = 18.sp
+            )
+
+            Text(
+                text = "@username",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
+
+    }
+}
+
+@Composable
+fun FavoriteShows() {
+    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
+        Text(
+            text = "Favorite Shows",
+            color = Color(0xFFB8C5D6),
+            fontSize = 25.sp
+        )
+
+        Box(modifier = Modifier.padding(top = 10.dp)) {
+            LazyRow(
+                verticalAlignment = Alignment.Top,
+                contentPadding = PaddingValues(vertical = 5.dp),
+                modifier = Modifier.padding(top = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(4) {
+                    BoxSeries()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CurrentlyWatching() {
+    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
+        Text(
+            text = "Currently Watching",
+            color = Color(0xFFB8C5D6),
+            fontSize = 25.sp
+        )
+
+        Box(modifier = Modifier.padding(top = 10.dp)) {
+            LazyRow(
+                verticalAlignment = Alignment.Top,
+                contentPadding = PaddingValues(vertical = 5.dp),
+                modifier = Modifier.padding(top = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(15) {
+                    BoxSeries()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Statistics() {
+    Column(modifier = Modifier
+        .padding(horizontal = 20.dp, vertical = 15.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Episodes this month",
+                color = Color(0xFFB8C5D6),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+            )
+
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "51",
+                color = Color(0xFFB8C5D6),
+                fontSize = 16.sp,
+                textAlign = TextAlign.End,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+            )
+        }
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Now Watching",
+                color = Color(0xFFB8C5D6),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+            )
+
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "5 shows",
+                color = Color(0xFFB8C5D6),
+                fontSize = 16.sp,
+                textAlign = TextAlign.End,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+            )
+        }
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Finished Shows",
+                color = Color(0xFFB8C5D6),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+            )
+
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "13",
+                color = Color(0xFFB8C5D6),
+                fontSize = 16.sp,
+                textAlign = TextAlign.End,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+            )
+        }
+
+
+    }
+}
+
+
+@Composable
+fun BoxSeries() {
+    Box(
+        modifier = Modifier
+            .height(114.dp)
+            .width(76.dp)
+            .background(color = Color(0xFFB8C5D6))
+    ) {}
+}
+
+
+@Preview
+@Composable
+fun ProfileScreenPreview() {
+    ProfileScreen()
+}

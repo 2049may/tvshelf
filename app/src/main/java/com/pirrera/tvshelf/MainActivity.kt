@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pirrera.tvshelf.components.ProfileScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 
@@ -54,7 +55,7 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(Color(0xff212529)),
                     bottomBar = {
-                        NavigationBar{
+                        NavigationBar {
                             BottomAppBar(
                                 containerColor = Color(0xFF2D3339),
                                 tonalElevation = 8.dp,
@@ -64,26 +65,35 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceEvenly
                                     ) {
-                                        BottomAppBarButton("home", isSelected = selectedIcon == "home", onIconClick = { selectedIcon = "home" })
-                                        BottomAppBarButton("search", isSelected = selectedIcon == "search", onIconClick = { selectedIcon = "search" })
-                                        BottomAppBarButton("profile", isSelected = selectedIcon == "profile", onIconClick = { selectedIcon = "profile" })
-
+                                        BottomAppBarButton(
+                                            "home",
+                                            isSelected = selectedIcon == "home",
+                                            onIconClick = { selectedIcon = "home" })
+                                        BottomAppBarButton(
+                                            "search",
+                                            isSelected = selectedIcon == "search",
+                                            onIconClick = { selectedIcon = "search" })
+                                        BottomAppBarButton(
+                                            "profile",
+                                            isSelected = selectedIcon == "profile",
+                                            onIconClick = { selectedIcon = "profile" })
                                     }
 
                                 },
 
-
                                 )
                         }
-                        }
-                        ,
-                ) {
+                    },
+                ) { innerPadding ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color(0xff212529))
+                            .padding(innerPadding)
                     ) {
+                        ProfileScreen()
                     }
+
                 }
             }
         }
