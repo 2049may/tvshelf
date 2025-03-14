@@ -24,6 +24,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,26 +54,29 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(Color(0xff212529)),
                     bottomBar = {
-                        BottomAppBar(
-                            containerColor = Color(0xFF2D3339),
-                            tonalElevation = 8.dp,
-                            actions = {
-                                var selectedIcon by remember { mutableStateOf<String?>(null) }
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
-                                    BottomAppBarButton("home", isSelected = selectedIcon == "home", onIconClick = { selectedIcon = "home" })
-                                    BottomAppBarButton("search", isSelected = selectedIcon == "search", onIconClick = { selectedIcon = "search" })
-                                    BottomAppBarButton("profile", isSelected = selectedIcon == "profile", onIconClick = { selectedIcon = "profile" })
+                        NavigationBar{
+                            BottomAppBar(
+                                containerColor = Color(0xFF2D3339),
+                                tonalElevation = 8.dp,
+                                actions = {
+                                    var selectedIcon by remember { mutableStateOf<String?>(null) }
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        BottomAppBarButton("home", isSelected = selectedIcon == "home", onIconClick = { selectedIcon = "home" })
+                                        BottomAppBarButton("search", isSelected = selectedIcon == "search", onIconClick = { selectedIcon = "search" })
+                                        BottomAppBarButton("profile", isSelected = selectedIcon == "profile", onIconClick = { selectedIcon = "profile" })
 
-                                }
+                                    }
 
-                            },
+                                },
 
 
-                            )
-                    },
+                                )
+                        }
+                        }
+                        ,
                 ) {
                     Box(
                         modifier = Modifier
