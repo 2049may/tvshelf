@@ -114,16 +114,14 @@ fun FavoriteShows() {
             fontSize = 25.sp
         )
 
-        Box(modifier = Modifier.padding(top = 10.dp)) {
-            LazyRow(
-                verticalAlignment = Alignment.Top,
-                contentPadding = PaddingValues(vertical = 5.dp),
-                modifier = Modifier.padding(top = 5.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(4) {
-                    BoxSeries()
-                }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            repeat(4) {
+                BoxSeries(modifier = Modifier.weight(1f))
             }
         }
     }
@@ -138,16 +136,14 @@ fun CurrentlyWatching() {
             fontSize = 25.sp
         )
 
-        Box(modifier = Modifier.padding(top = 10.dp)) {
-            LazyRow(
-                verticalAlignment = Alignment.Top,
-                contentPadding = PaddingValues(vertical = 5.dp),
-                modifier = Modifier.padding(top = 5.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(15) {
-                    BoxSeries()
-                }
+        LazyRow(
+            verticalAlignment = Alignment.Top,
+            contentPadding = PaddingValues(vertical = 5.dp),
+            modifier = Modifier.padding(top = 5.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(15) {
+                BoxSeries()
             }
         }
     }
@@ -224,13 +220,12 @@ fun Statistics() {
 
 
 @Composable
-fun BoxSeries() {
+fun BoxSeries(modifier: Modifier = Modifier.width(76.dp)) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .height(114.dp)
-            .width(76.dp)
             .background(color = Color(0xFFB8C5D6))
-    ) {}
+    )
 }
 
 
