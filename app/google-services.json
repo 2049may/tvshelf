@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "471949683438",
+    "project_id": "tvshelf2049",
+    "storage_bucket": "tvshelf2049.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471949683438:android:6c61cb03489197054aa1ff",
+        "android_client_info": {
+          "package_name": "com.pirrera.tvshelf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-M2TQL9839ItD073O1qNMVnHv5HPsgRg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

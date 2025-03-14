@@ -29,21 +29,26 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.google.firebase.BuildConfig
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.pirrera.tvshelf.components.ProfileScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 //import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 //import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 //import view.NavGraphs
+import com.pirrera.tvshelf.auth.FirebaseEmulatorConfig
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseEmulatorConfig.configureFireBaseServices()
         enableEdgeToEdge()
         setContent {
             TVshelfTheme {
-                //DestinationsNavHost(navGraph = NavGraphs.root)
                 MainScreen()
             }
         }
