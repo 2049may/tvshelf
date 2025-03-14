@@ -2,8 +2,6 @@ package com.pirrera.tvshelf
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,22 +9,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,13 +27,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pirrera.tvshelf.components.HomeScreen
+import com.pirrera.tvshelf.components.ProfileScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
-import com.ramcosta.composedestinations.DestinationsNavHost
+//import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.annotation.Destination
+//import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+//import view.NavGraphs
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -50,46 +44,62 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TVshelfTheme {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xff212529)),
-                    bottomBar = {
-                        NavigationBar{
-                            BottomAppBar(
-                                containerColor = Color(0xFF2D3339),
-                                tonalElevation = 8.dp,
-                                actions = {
-                                    var selectedIcon by remember { mutableStateOf<String?>(null) }
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly
-                                    ) {
-                                        BottomAppBarButton("home", isSelected = selectedIcon == "home", onIconClick = { selectedIcon = "home"; })
-                                        BottomAppBarButton("search", isSelected = selectedIcon == "search", onIconClick = { selectedIcon = "search" })
-                                        BottomAppBarButton("profile", isSelected = selectedIcon == "profile", onIconClick = { selectedIcon = "profile" })
+                //DestinationsNavHost(navGraph = NavGraphs.root)
+                MainScreen()
+            }
+        }
+    }
+}
 
-                                    }
+@Composable
+fun MainScreen() {
+    var selectedIcon by remember { mutableStateOf<String?>(null) }
 
-                                },
-
-
-                                )
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xff212529)),
+        bottomBar = {
+            NavigationBar {
+                BottomAppBar(
+                    containerColor = Color(0xFF2D3339),
+                    tonalElevation = 8.dp,
+                    actions = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            BottomAppBarButton(
+                                "home",
+                                isSelected = selectedIcon == "home",
+                                onIconClick = { selectedIcon = "home" })
+                            BottomAppBarButton(
+                                "search",
+                                isSelected = selectedIcon == "search",
+                                onIconClick = { selectedIcon = "search" })
+                            BottomAppBarButton(
+                                "profile",
+                                isSelected = selectedIcon == "profile",
+                                onIconClick = { selectedIcon = "profile" })
                         }
-                        }
-                        ,
-                ) { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xff212529))
-                            .padding(innerPadding)
-                    ) {
-                        HomeScreen()
-                    }
 
-                }
+                    },
 
+                    )
+            }
+        },
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xff212529))
+                .padding(innerPadding)
+        ) {
+            when (selectedIcon) {
+                "home" -> HomeScreen()
+                //"search" -> SearchScreen()
+                "profile" -> ProfileScreen()
+                else -> HomeScreen()
             }
         }
     }
@@ -105,7 +115,7 @@ fun BottomAppBarButton(
         "search" -> R.drawable.glass
         "profile" -> R.drawable.profile
         "home" -> R.drawable.home
-        else -> R.drawable.glass // TODO(): default à modifier
+        else -> R.drawable.glass // Default icon
     }
 
     IconButton(onClick = onIconClick) {
