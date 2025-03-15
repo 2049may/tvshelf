@@ -11,6 +11,7 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2024.04.01"
 composeDestination = "1.11.9"
+retrofit = "2.11.0"
 firebaseCrashlytics = "19.4.1"
 googleGmsGoogleServices = "4.4.2"
 googleFirebaseCrashlytics = "3.0.3"
@@ -38,6 +39,8 @@ compose-destinations-core = { module = "io.github.raamcosta.compose-destinations
 compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "composeDestination" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+retrofit = {module = "com.squareup.retrofit2:retrofit",version.ref = "retrofit"}
+converter-gson = {module = "com.squareup.retrofit2:converter-gson",version.ref = "retrofit"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

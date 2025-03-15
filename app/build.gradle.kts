@@ -71,4 +71,8 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation(libs.firebase.auth)
 
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
 }
