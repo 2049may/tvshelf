@@ -46,19 +46,25 @@ import com.pirrera.tvshelf.auth.FirebaseEmulatorConfig
 //import com.pirrera.tvshelf.components.NavGraphs
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.dependency
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         FirebaseEmulatorConfig.configureFireBaseServices()
+
         enableEdgeToEdge()
 
-        //val authViewModel : AuthViewModel by viewModels()
+        val authViewModel : AuthViewModel by viewModels()
 
         setContent {
             TVshelfTheme {
-                DestinationsNavHost(navGraph = NavGraphs.root)
+                DestinationsNavHost(navGraph = NavGraphs.root,
+                    dependenciesContainerBuilder = {
+                        dependency(authViewModel)
+                    })
             }
         }
     }
