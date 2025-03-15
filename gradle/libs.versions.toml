@@ -1,10 +1,12 @@
 [versions]
 agp = "8.8.2"
+coilNetworkOkhttp = "3.1.0"
 firebaseBom = "33.10.0"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
+kotlinxSerializationJson = "1.6.3"
 ksp = "2.0.0-1.0.23"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
@@ -19,6 +21,7 @@ firebaseFirestoreKtx = "25.1.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics.ktx" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
@@ -39,6 +42,7 @@ compose-destinations-core = { module = "io.github.raamcosta.compose-destinations
 compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "composeDestination" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlin:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 retrofit = {module = "com.squareup.retrofit2:retrofit",version.ref = "retrofit"}
 converter-gson = {module = "com.squareup.retrofit2:converter-gson",version.ref = "retrofit"}
 

@@ -29,6 +29,7 @@ import androidx.navigation.Navigator
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.MainScreenDestination
+import com.pirrera.tvshelf.destinations.SignupScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavOptionsBuilder
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -93,6 +94,7 @@ fun LoginScreen(navigator: DestinationsNavigator/*, authViewModel: AuthViewModel
         )
 
         TextButton(onClick = {
+            navigator.navigate(SignupScreenDestination)
         }) {
             Text("Don't have an account? Sign up", color = Color(0xFFB8C5D6))
         }

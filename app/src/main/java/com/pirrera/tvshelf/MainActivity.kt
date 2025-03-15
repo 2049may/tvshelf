@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
         FirebaseEmulatorConfig.configureFireBaseServices()
         enableEdgeToEdge()
 
-        val authViewModel : AuthViewModel by viewModels()
+        //val authViewModel : AuthViewModel by viewModels()
 
         setContent {
             TVshelfTheme {
