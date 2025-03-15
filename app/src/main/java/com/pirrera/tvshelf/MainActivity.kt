@@ -38,6 +38,7 @@ import com.google.firebase.firestore.firestore
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.components.HomeScreen
 import com.pirrera.tvshelf.components.ProfileScreen
+import com.pirrera.tvshelf.components.SearchScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 //import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
@@ -120,7 +121,7 @@ fun MainScreen(navigator: DestinationsNavigator) {
         ) {
             when (selectedIcon) {
                 "home" -> HomeScreen()
-                //"search" -> SearchScreen()
+                "search" -> SearchScreen()
                 "profile" -> ProfileScreen()
                 else -> HomeScreen()
             }
