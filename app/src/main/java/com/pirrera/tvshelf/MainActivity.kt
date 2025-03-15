@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.pirrera.tvshelf.components.HomeScreen
 import com.pirrera.tvshelf.components.ProfileScreen
+import com.pirrera.tvshelf.components.SearchScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 //import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
@@ -97,7 +98,7 @@ fun MainScreen() {
         ) {
             when (selectedIcon) {
                 "home" -> HomeScreen()
-                //"search" -> SearchScreen()
+                "search" -> SearchScreen()
                 "profile" -> ProfileScreen()
                 else -> HomeScreen()
             }

@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import com.pirrera.tvshelf.api.ApiViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,11 +63,11 @@ fun HomeScreen(viewModel: ApiViewModel = viewModel()){
                         AsyncImage(
                             model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                             contentDescription = null,
-                            modifier = Modifier.height(150.dp)
-                                .width(100.dp)
+                            modifier = Modifier
+                                .height(150.dp)
+                                .width(100.dp),
                         )
                     }
-
                 }
             }
 
@@ -139,7 +140,20 @@ fun HomeScreen(viewModel: ApiViewModel = viewModel()){
                 }
             }
         }
-    }}
+    }
+    @Composable
+    fun BoxSeries(){
+        Box(modifier = Modifier.width(100.dp).height(150.dp).background(Color(0xFFB8C5D6))){
+        }
+    }
+}
+
+
+
+
+
+
+
 
 
 

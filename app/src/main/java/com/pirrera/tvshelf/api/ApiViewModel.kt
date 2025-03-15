@@ -100,4 +100,30 @@ class ApiViewModel: ViewModel() {
             }
         }
     }
+
+    private val _seriesSearch: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val seriesSearch: StateFlow<List<Series>> = _seriesSearch.asStateFlow()
+
+    fun fetchSeriesForResearch() {
+        viewModelScope.launch {
+            try {
+                val response12 = RetrofitInstance.api.getSeriesForSearch12()
+                val response11 =  RetrofitInstance.api.getSeriesForSearch11()
+                val response10 = RetrofitInstance.api.getSeriesForSearch10()
+                val response9 =  RetrofitInstance.api.getSeriesForSearch9()
+                val response8 = RetrofitInstance.api.getSeriesForSearch8()
+                val response7 =  RetrofitInstance.api.getSeriesForSearch7()
+                val response6 = RetrofitInstance.api.getSeriesForSearch6()
+                val response5 =  RetrofitInstance.api.getSeriesForSearch5()
+                val response4 = RetrofitInstance.api.getSeriesForSearch4()
+                val response3 = RetrofitInstance.api.getSeriesForSearch3()
+                val response2 =  RetrofitInstance.api.getSeriesForSearch2()
+                val response1 = RetrofitInstance.api.getSeriesForSearch1()
+                val response0 = RetrofitInstance.api.getSeriesForSearch0()
+                _seriesSearch.value = (response10.results + response9.results + response8.results + response7.results + response6.results + response5.results + response4.results + response3.results + response2.results + response1.results + response11.results + response12.results + response0.results).distinct()
+            } catch (e: Exception) {
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
 }
