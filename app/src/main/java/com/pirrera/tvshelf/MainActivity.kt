@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -29,18 +30,22 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import com.google.firebase.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.components.HomeScreen
 import com.pirrera.tvshelf.components.ProfileScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 //import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 //import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-//import view.NavGraphs
 import com.pirrera.tvshelf.auth.FirebaseEmulatorConfig
+//import com.pirrera.tvshelf.components.NavGraphs
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -48,18 +53,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         FirebaseEmulatorConfig.configureFireBaseServices()
         enableEdgeToEdge()
+
+        val authViewModel : AuthViewModel by viewModels()
+
         setContent {
             TVshelfTheme {
-                //DestinationsNavHost(navGraph = NavGraphs.root)
-                MainScreen()
+                DestinationsNavHost(navGraph = NavGraphs.root)
             }
         }
     }
 }
 
+@Destination
 @Composable
-fun MainScreen() {
+fun MainScreen(navigator: DestinationsNavigator) {
     var selectedIcon by remember { mutableStateOf<String?>(null) }
+
 
     Scaffold(
         modifier = Modifier
@@ -79,10 +88,12 @@ fun MainScreen() {
                                 "home",
                                 isSelected = selectedIcon == "home",
                                 onIconClick = { selectedIcon = "home" })
+
                             BottomAppBarButton(
                                 "search",
                                 isSelected = selectedIcon == "search",
                                 onIconClick = { selectedIcon = "search" })
+
                             BottomAppBarButton(
                                 "profile",
                                 isSelected = selectedIcon == "profile",

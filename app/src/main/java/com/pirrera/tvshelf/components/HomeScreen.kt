@@ -28,8 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.pirrera.tvshelf.api.ApiViewModel
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Destination
 @Composable
 fun HomeScreen(viewModel: ApiViewModel = viewModel()){
     val seriesList by viewModel.series.collectAsState()
