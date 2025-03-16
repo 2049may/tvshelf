@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 
 class AuthViewModel : ViewModel() {
 
@@ -52,6 +53,18 @@ class AuthViewModel : ViewModel() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    user?.let{
+                        it.updateProfile(userProfileChangeRequest {
+                            displayName = pseudo
+                        }).addOnCompleteListener{profileTask ->
+                            if(profileTask.isSuccessful){
+                                _authState.value = AuthState.Authenticated
+                            } else {
+                                _authState.value = AuthState.Error(profileTask.exception?.message ?: "l'update a foiré mgl")
+                            }
+                        }
+                    }
                     _authState.value = AuthState.Authenticated
                 } else {
                     _authState.value = AuthState.Error(task.exception?.message ?: "c'est la D")

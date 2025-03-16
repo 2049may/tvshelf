@@ -24,6 +24,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +36,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
@@ -43,12 +47,16 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel = viewModel()) {
+
+    val user = Firebase.auth.currentUser
+    val pseudo = remember { mutableStateOf(user?.displayName?:"oula") }
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
     ) {
 
-        User()
+        User(pseudo.value)
         HorizontalDivider(
             color = Color(0xFFB8C5D6),
             thickness = 1.dp,
@@ -81,7 +89,7 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
 }
 
 @Composable
-fun User() {
+fun User(pseudo : String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,7 +110,7 @@ fun User() {
                 .padding(horizontal = 10.dp)
         ) {
             Text(
-                text = "Pseudo",
+                text = pseudo,
                 color = Color.White,
                 fontSize = 18.sp
             )
