@@ -60,8 +60,13 @@ class AuthViewModel : ViewModel() {
     }
 
     fun signout() {
-        auth.signOut()
-        _authState.value = AuthState.Unauthenticated
+        try {
+            auth.signOut()
+            _authState.value = AuthState.Unauthenticated
+        } catch (e: Exception) {
+            // Handle the error, e.g., log it or update the state to AuthState.Error
+            _authState.value = AuthState.Error("Sign out failed: ${e.message}")
+        }
     }
 }
 

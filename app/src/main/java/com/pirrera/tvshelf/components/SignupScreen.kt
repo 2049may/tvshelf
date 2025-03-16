@@ -32,6 +32,7 @@ import com.pirrera.tvshelf.auth.AuthState
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.HomeScreenDestination
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
+import com.pirrera.tvshelf.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -47,7 +48,7 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
 
     LaunchedEffect(authState.value) {
         when (authState.value) {
-            is AuthState.Authenticated -> navigator.navigate(HomeScreenDestination)
+            is AuthState.Authenticated -> navigator.navigate(MainScreenDestination)
             is AuthState.Error -> Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
             else -> Unit
         }
@@ -107,7 +108,8 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
         Button(colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB8C5D6)),
             onClick = {
                 authViewModel.signup(pseudo, email, password)
-            }) {
+            },
+            enabled = authState.value != AuthState.Loading) {
             Text("Create Account")
         }
         Spacer(

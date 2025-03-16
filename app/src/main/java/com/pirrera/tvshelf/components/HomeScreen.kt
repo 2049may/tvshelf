@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,17 +32,29 @@ import coil3.compose.SubcomposeAsyncImage
 import com.pirrera.tvshelf.api.ApiViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.pirrera.tvshelf.auth.AuthViewModel
+import com.pirrera.tvshelf.auth.AuthState
+import com.pirrera.tvshelf.destinations.LoginScreenDestination
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Destination
 @Composable
-fun HomeScreen(viewModel: ApiViewModel = viewModel()){
+fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewModel(), authViewModel: AuthViewModel= viewModel()){
     val seriesList by viewModel.series.collectAsState()
     val actionAdventureList by viewModel.seriesAction.collectAsState()
     val fictionFantasyList by viewModel.seriesFictionFantasy.collectAsState()
     val crimeList by viewModel.seriesCrime.collectAsState()
     val comedyList by viewModel.seriesComedy.collectAsState()
     val dramaList by viewModel.seriesDrama.collectAsState()
+
+    val authState = authViewModel.authState.observeAsState()
+
+    LaunchedEffect(authState.value) {
+        when (authState.value) {
+            is AuthState.Unauthenticated -> navigator.navigate(LoginScreenDestination)
+            else -> Unit
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchSeries()

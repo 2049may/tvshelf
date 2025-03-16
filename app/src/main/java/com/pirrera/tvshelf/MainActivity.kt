@@ -60,6 +60,7 @@ class MainActivity : ComponentActivity() {
 
         val authViewModel : AuthViewModel by viewModels()
 
+
         setContent {
             TVshelfTheme {
                 DestinationsNavHost(navGraph = NavGraphs.root,
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
 @Destination
 @Composable
 fun MainScreen(navigator: DestinationsNavigator) {
-    var selectedIcon by remember { mutableStateOf<String?>(null) }
+    var selectedIcon by remember { mutableStateOf<String?>("home") }
 
 
     Scaffold(
@@ -120,10 +121,10 @@ fun MainScreen(navigator: DestinationsNavigator) {
                 .padding(innerPadding)
         ) {
             when (selectedIcon) {
-                "home" -> HomeScreen()
+                "home" -> HomeScreen(navigator)
                 "search" -> SearchScreen()
-                "profile" -> ProfileScreen()
-                else -> HomeScreen()
+                "profile" -> ProfileScreen(navigator)
+                else -> HomeScreen(navigator)
             }
         }
     }
