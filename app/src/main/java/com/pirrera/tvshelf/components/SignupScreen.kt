@@ -67,7 +67,7 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(R.drawable.default_pfp),
+            painter = painterResource(R.drawable.logo_tvshelf_500px),
             contentDescription = "Logo"
         )
 

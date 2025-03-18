@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -77,13 +78,24 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
         )
 
         Statistics()
+        HorizontalDivider(
+            color = Color(0xFFB8C5D6),
+            thickness = 1.dp
+        )
 
-        TextButton( onClick = {
+        TextButton(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp), onClick = {
             authViewModel.signout()
             navigator.navigate(LoginScreenDestination)
         }) {
-            Text("Log out", color = Color.Red)
+            Text("Log out",
+                color = Color.Red,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+            )
         }
+
+        Spacer(modifier = Modifier.height(5.dp))
 
     }
 }

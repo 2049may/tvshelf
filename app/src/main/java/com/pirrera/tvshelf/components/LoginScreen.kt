@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,9 +43,11 @@ import com.pirrera.tvshelf.destinations.HomeScreenDestination
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
 import com.pirrera.tvshelf.destinations.MainScreenDestination
 import com.pirrera.tvshelf.destinations.SignupScreenDestination
+import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavOptionsBuilder
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationSpec
 import com.ramcosta.composedestinations.spec.Direction
 import com.ramcosta.composedestinations.spec.Route
@@ -75,8 +78,8 @@ fun LoginScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel= 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(R.drawable.default_pfp),
-            contentDescription = "Logo"
+            painter = painterResource(R.drawable.logo_tvshelf_500px),
+            contentDescription = "Logo",
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -94,6 +97,7 @@ fun LoginScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel= 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
+            // TODO: add password visibility
             value = password,
             onValueChange = {
                 password = it
@@ -128,5 +132,3 @@ fun LoginScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel= 
     }
 
 }
-
-
