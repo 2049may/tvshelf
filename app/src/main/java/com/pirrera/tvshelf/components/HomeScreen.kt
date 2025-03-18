@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import coil3.compose.SubcomposeAsyncImage
@@ -68,9 +69,10 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
 
     Column (modifier = Modifier
         .fillMaxSize().
-        verticalScroll(rememberScrollState())){
-        Box(modifier = Modifier.padding(top = 40.dp)) {
-            Text("Action", color = Color(0xFFB8C5D6))
+        verticalScroll(rememberScrollState())
+        .padding(horizontal = 8.dp)){
+        Box(modifier = Modifier.padding(top = 30.dp)) {
+            Text("Action", color = Color(0xFFB8C5D6), fontSize = 22.sp)
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
@@ -90,7 +92,7 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
 
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Science Fiction", color = Color(0xFFB8C5D6))
+            Text("Science Fiction", color = Color(0xFFB8C5D6), fontSize = 22.sp)
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
@@ -107,7 +109,7 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Crime", color = Color(0xFFB8C5D6))
+            Text("Crime", color = Color(0xFFB8C5D6), fontSize = 22.sp)
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
@@ -124,7 +126,7 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Comedy", color = Color(0xFFB8C5D6))
+            Text("Comedy", color = Color(0xFFB8C5D6), fontSize = 22.sp)
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
@@ -141,7 +143,7 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Drama", color = Color(0xFFB8C5D6))
+            Text("Drama", color = Color(0xFFB8C5D6), fontSize = 22.sp)
             LazyRow(verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
