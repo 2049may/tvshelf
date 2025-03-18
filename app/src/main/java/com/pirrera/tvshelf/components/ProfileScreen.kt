@@ -88,7 +88,7 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
             navigator.navigate(LoginScreenDestination)
         }) {
             Text("Log out",
-                color = Color.Red,
+                color = Color(0xFFB85156),
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium

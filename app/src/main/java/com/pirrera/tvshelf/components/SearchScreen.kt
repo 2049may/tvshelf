@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -76,7 +77,7 @@ fun SearchScreen(viewModel: ApiViewModel = viewModel()){
                         .background(Color(0xFF2D3339))
                         .height(50.dp),
                     textStyle = TextStyle(color = Color(0xFFB8C5D6), fontSize = 18.sp),
-                    placeholder = { Text("Search ...", color = Color(0xFFB8C5D6)) },
+                    placeholder = { Text("Search...", color = Color(0xFFB8C5D6)) },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFF2D3339),
                         unfocusedContainerColor = Color(0xFF2D3339),
@@ -92,23 +93,24 @@ fun SearchScreen(viewModel: ApiViewModel = viewModel()){
                 items(searchList){
                     series ->
                     if(series.name.contains(searchBar, ignoreCase = true)){
-                        Spacer(modifier = Modifier.height(15.dp))
                         Row{
                             AsyncImage(
                                 model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .height(120.dp)
-                                    .width(80.dp),
+                                    .height(135.dp)
+                                    .width(90.dp),
                             )
                             Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding( start = 10.dp)) {
                                 Text(series.name, color = Color(0xFFB8C5D6))
-                                Text(series.originCountry.toString(),color = Color(0xFFB8C5D6))
-                                Text(series.voteAverage.toString() + "/ 10",color = Color(0xFFB8C5D6))
+                                Text(series.originCountry.toString().replace("[", "").replace("]",""),color = Color(0xFFB8C5D6))
+                                Text(series.voteAverage.toString() + " / 10",color = Color(0xFFB8C5D6))
                             }
                         }
-                        Spacer(modifier = Modifier.height(15.dp))
-                        Box(modifier = Modifier.height(3.dp).fillMaxWidth().background(Color(0xFF000000)))
+                        HorizontalDivider(
+                            color = Color(0xFF000000),
+                            thickness = 3.dp,
+                        )
                     }
                 }
             }
