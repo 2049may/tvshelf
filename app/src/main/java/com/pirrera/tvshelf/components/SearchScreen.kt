@@ -1,8 +1,10 @@
 package com.pirrera.tvshelf.components
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -37,12 +40,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.api.ApiViewModel
+import com.pirrera.tvshelf.destinations.Destination
+import com.pirrera.tvshelf.destinations.SerieScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@com.ramcosta.composedestinations.annotation.Destination
 @Composable
-fun SearchScreen(viewModel: ApiViewModel = viewModel()){
+fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = viewModel()){
     var searchBar by remember { mutableStateOf("") }
     val searchList by viewModel.seriesSearch.collectAsState()
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.fetchSeriesForResearch()
     }
@@ -93,7 +100,11 @@ fun SearchScreen(viewModel: ApiViewModel = viewModel()){
                 items(searchList){
                     series ->
                     if(series.name.contains(searchBar, ignoreCase = true)){
-                        Row{
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview))
+                        }){
                             AsyncImage(
                                 model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                                 contentDescription = null,

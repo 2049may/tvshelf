@@ -122,7 +122,7 @@ fun MainScreen(navigator: DestinationsNavigator) {
         ) {
             when (selectedIcon) {
                 "home" -> HomeScreen(navigator)
-                "search" -> SearchScreen()
+                "search" -> SearchScreen(navigator = navigator)
                 "profile" -> ProfileScreen(navigator)
                 else -> HomeScreen(navigator)
             }

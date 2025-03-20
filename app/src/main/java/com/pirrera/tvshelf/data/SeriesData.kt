@@ -1,12 +1,13 @@
 package com.pirrera.tvshelf.data
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-
 
 data class SeriesData(
     @SerializedName("page") val page: Int,
     @SerializedName("results") val results: List<Series>,
 )
+
 
 data class Series(
     @SerializedName("adult") val adult: Boolean,
