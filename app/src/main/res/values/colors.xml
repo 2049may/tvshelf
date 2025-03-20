@@ -12,4 +12,5 @@
     <color name="background">#212529</color>
     <color name="red">#AE474C</color>
     <color name="yellow">#F7DE50</color>
+    <color name="tertiary">#E5EAF0</color>
 </resources>
