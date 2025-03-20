@@ -1,5 +1,6 @@
 package com.pirrera.tvshelf.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +16,13 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -31,7 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
@@ -42,6 +49,8 @@ import com.pirrera.tvshelf.destinations.HomeScreenDestination
 import com.pirrera.tvshelf.destinations.MainScreenDestination
 import com.pirrera.tvshelf.destinations.SerieScreenDestination
 import com.pirrera.tvshelf.ui.theme.Background
+import com.pirrera.tvshelf.ui.theme.Primary
+import com.pirrera.tvshelf.ui.theme.Red
 import com.pirrera.tvshelf.ui.theme.Yellow
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -102,6 +111,13 @@ fun SerieScreen(
 
             Rating(5)
 
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()) {
+                WatchButton()
+                FavoriteButton()
+            }
+
         }
     }
 }
@@ -111,8 +127,8 @@ fun Rating(maxStars : Int = 5, posterWidth: Int = 220) {
     var selectedStars by remember { mutableStateOf(0) }
 
     Row(
-        modifier = Modifier.width(posterWidth.dp),
-        horizontalArrangement = Arrangement.spacedBy((-2).dp)
+       // modifier = Modifier.width((posterWidth).dp),
+        horizontalArrangement =  Arrangement.spacedBy((-3).dp)
     ) {
         for (i in 1..maxStars) {
             IconButton(onClick = { selectedStars = i }) {
@@ -133,5 +149,55 @@ fun Rating(maxStars : Int = 5, posterWidth: Int = 220) {
 fun WatchButton() {
 
     var watching by remember { mutableStateOf(false) }
+
+    OutlinedButton(
+        modifier = Modifier.width(150.dp)
+            .padding(5.dp),
+        onClick = { watching = !watching },
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (watching) Primary else Color.Transparent,
+            contentColor = if (watching) Background else Primary
+        ),
+        elevation = ButtonDefaults.buttonElevation(5.dp),
+        border = (if (!watching) Primary else null)?.let { BorderStroke(2.dp, it) },
+    ) {
+        Text(fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            text = if (watching) {
+            "Watching"
+        } else "Watch Now")
+    }
+
+}
+
+@Composable
+fun FavoriteButton() {
+    var favorite by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { favorite = !favorite }) {
+        Icon(
+            painter = painterResource(
+                id = if (favorite) R.drawable.filledheart else R.drawable.emptyheart
+            ),
+            contentDescription = "Favorite",
+            tint = Red)
+    }
+
+}
+
+//@Preview
+//@Composable
+//fun RatingPreview() {
+//
+//    Rating()
+//
+//}
+
+
+@Preview(showBackground = true)
+@Composable
+fun WatchButtonPreview() {
+    WatchButton()
 
 }
