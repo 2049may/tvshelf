@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +45,8 @@ import com.pirrera.tvshelf.destinations.HomeScreenDestination
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
 import com.pirrera.tvshelf.destinations.MainScreenDestination
 import com.pirrera.tvshelf.destinations.SignupScreenDestination
+import com.pirrera.tvshelf.ui.theme.Background
+import com.pirrera.tvshelf.ui.theme.Primary
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavOptionsBuilder
@@ -73,7 +77,7 @@ fun LoginScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel= 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xff212529)),
+            .background(Background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -91,7 +95,8 @@ fun LoginScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel= 
             },
             label = {
                 Text("Email")
-            }
+            },
+            textStyle = TextStyle(color = Primary)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -105,13 +110,14 @@ fun LoginScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel= 
             label = {
                 Text("Password")
             },
+            textStyle = TextStyle(color = Primary),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB8C5D6)),
+        Button(colors = ButtonDefaults.buttonColors(containerColor = Primary),
             onClick = {
                 authViewModel.login(email, password)
         },
@@ -126,7 +132,7 @@ fun LoginScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel= 
         TextButton(onClick = {
             navigator.navigate(SignupScreenDestination)
         }) {
-            Text("Don't have an account? Sign up", color = Color(0xFFB8C5D6))
+            Text("Don't have an account? Sign up", color = Primary)
         }
 
     }
