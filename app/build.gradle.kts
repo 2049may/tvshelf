@@ -64,7 +64,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
-
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     // Import the BoM for the Firebase platform
     implementation(platform(libs.firebase.bom))
 

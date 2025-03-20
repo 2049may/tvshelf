@@ -1,7 +1,9 @@
 package com.pirrera.tvshelf.components
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,7 +38,9 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.auth.AuthState
+import com.pirrera.tvshelf.data.Series
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
+import com.pirrera.tvshelf.destinations.SerieScreenDestination
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Destination
@@ -47,7 +52,7 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
     val crimeList by viewModel.seriesCrime.collectAsState()
     val comedyList by viewModel.seriesComedy.collectAsState()
     val dramaList by viewModel.seriesDrama.collectAsState()
-
+    val context = LocalContext.current
     val authState = authViewModel.authState.observeAsState()
 
     LaunchedEffect(authState.value) {
@@ -66,43 +71,52 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
         viewModel.fetchSeriesByDrama()
     }
 
-
     Column (modifier = Modifier
         .fillMaxSize().
         verticalScroll(rememberScrollState())
-        .padding(horizontal = 8.dp)){
+        .padding(horizontal = 8.dp)) {
         Box(modifier = Modifier.padding(top = 30.dp)) {
             Text("Action", color = Color(0xFFB8C5D6), fontSize = 22.sp)
-            LazyRow(verticalAlignment = Alignment.Top,
+            LazyRow(
+                verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    items(actionAdventureList) { series ->
-                        AsyncImage(
-                            model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .height(150.dp)
-                                .width(100.dp),
-                        )
-                    }
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(actionAdventureList) { series ->
+                    AsyncImage(
+                        model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(150.dp)
+                            .width(100.dp)
+                            .clickable {
+                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview))
+                            }
+                    )
                 }
             }
+        }
 
 
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
             Text("Science Fiction", color = Color(0xFFB8C5D6), fontSize = 22.sp)
-            LazyRow(verticalAlignment = Alignment.Top,
+            LazyRow(
+                verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 items(fictionFantasyList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
+                            .clickable {
+                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview))
+                            },
                     )
                 }
             }
@@ -110,16 +124,21 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
             Text("Crime", color = Color(0xFFB8C5D6), fontSize = 22.sp)
-            LazyRow(verticalAlignment = Alignment.Top,
+            LazyRow(
+                verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 items(crimeList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
+                            .clickable {
+                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview))
+                            },
                     )
                 }
             }
@@ -127,16 +146,21 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
             Text("Comedy", color = Color(0xFFB8C5D6), fontSize = 22.sp)
-            LazyRow(verticalAlignment = Alignment.Top,
+            LazyRow(
+                verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 items(comedyList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
+                            .clickable {
+                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview))
+                            },
                     )
                 }
             }
@@ -144,21 +168,27 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
             Text("Drama", color = Color(0xFFB8C5D6), fontSize = 22.sp)
-            LazyRow(verticalAlignment = Alignment.Top,
+            LazyRow(
+                verticalAlignment = Alignment.Top,
                 contentPadding = PaddingValues(vertical = 15.dp),
                 modifier = Modifier.padding(top = 25.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 items(dramaList) { series ->
                     AsyncImage(
                         model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
                         contentDescription = null,
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
+                            .clickable {
+                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview))
+                            },
                     )
                 }
             }
         }
     }
+
     @Composable
     fun BoxSeries(){
         Box(modifier = Modifier.width(100.dp).height(150.dp).background(Color(0xFFB8C5D6))){
