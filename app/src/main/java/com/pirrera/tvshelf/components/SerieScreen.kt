@@ -22,13 +22,17 @@ import com.ramcosta.composedestinations.result.ResultRecipient
 
 @Destination
 @Composable
-fun SerieScreen(navigator: DestinationsNavigator, serieName : String,serieOverview : String){
-
+fun SerieScreen(
+    navigator: DestinationsNavigator,
+    serieName: String,
+    serieOverview: String
+) {
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Background),
         topBar = {
-            Button(onClick = { navigator.navigate(MainScreenDestination) }) {
+            Button(onClick = { navigator.popBackStack() }) {
                 Text("Back")
             }
         }

@@ -5,6 +5,9 @@ plugins {
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+
 }
 
 android {
@@ -77,4 +80,11 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation(libs.coil.network.okhttp)
     //implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+}
+
+kapt {
+    correctErrorTypes = true
 }

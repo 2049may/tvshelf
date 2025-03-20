@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,11 +41,8 @@ import com.pirrera.tvshelf.components.HomeScreen
 import com.pirrera.tvshelf.components.ProfileScreen
 import com.pirrera.tvshelf.components.SearchScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
-//import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
-//import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.pirrera.tvshelf.auth.FirebaseEmulatorConfig
-//import com.pirrera.tvshelf.components.NavGraphs
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.dependency
@@ -74,9 +72,11 @@ class MainActivity : ComponentActivity() {
 
 @Destination
 @Composable
-fun MainScreen(navigator: DestinationsNavigator) {
-    var selectedIcon by remember { mutableStateOf<String?>("home") }
+fun MainScreen(
+    navigator: DestinationsNavigator) {
 
+    //var selectedIcon by remember { mutableStateOf<String?>("home") }
+    var selectedIcon by rememberSaveable { mutableStateOf("home") }
 
     Scaffold(
         modifier = Modifier
