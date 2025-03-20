@@ -43,6 +43,7 @@ import com.pirrera.tvshelf.components.SearchScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.pirrera.tvshelf.auth.FirebaseEmulatorConfig
+import com.pirrera.tvshelf.ui.theme.Background
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.dependency
@@ -81,7 +82,7 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xff212529)),
+            .background(Background),
         bottomBar = {
             NavigationBar {
                 BottomAppBar(
