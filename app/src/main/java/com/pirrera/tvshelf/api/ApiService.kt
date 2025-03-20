@@ -2,6 +2,7 @@ package com.pirrera.tvshelf.api
 
 import com.pirrera.tvshelf.data.SeriesData
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface ApiService {
     @GET("tv?api_key=232c2294d3026daa9a8273d9c624c4d8&sort_by=popularity.desc&with_watch_providers=8|337|350|119|283|15&watch_region=FR")
@@ -61,6 +62,15 @@ interface ApiService {
 
     @GET("../search/tv?api_key=232c2294d3026daa9a8273d9c624c4d8&query=High+Fidelity&language=fr-FR")
     suspend fun getSeriesForSearch0(): SeriesData
+
+    @GET("tv")
+    suspend fun getASerie(
+        @Query("query") film: String,
+        @Query("api_key") apiKey: String = "232c2294d3026daa9a8273d9c624c4d8",
+        @Query("language") language: String = "fr-FR"
+    ): SeriesData
+
+
 }
 
 //https://api.themoviedb.org/3/discover/tv?api_key=232c2294d3026daa9a8273d9c624c4d8&sort_by=popularity.desc&with_watch_providers=8|337|350|119|283|15&watch_region=FR&page=1

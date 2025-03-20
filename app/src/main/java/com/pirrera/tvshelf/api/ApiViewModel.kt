@@ -126,4 +126,18 @@ class ApiViewModel: ViewModel() {
             }
         }
     }
+
+    private val _searchASerie: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val searchASerie: StateFlow<List<Series>> = _searchASerie.asStateFlow()
+
+    fun fetchSeriesASerie(film : String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.apiSearch.getASerie(film)
+                _seriesSearch.value = response.results
+            } catch (e: Exception) {
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
 }

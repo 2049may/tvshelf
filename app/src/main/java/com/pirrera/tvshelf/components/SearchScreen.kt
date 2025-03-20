@@ -1,6 +1,7 @@
 package com.pirrera.tvshelf.components
 
 import android.annotation.SuppressLint
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,13 +50,16 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @com.ramcosta.composedestinations.annotation.Destination
 @Composable
-fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = viewModel()){
+fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = viewModel()) {
     var searchBar by remember { mutableStateOf("") }
     val searchList by viewModel.seriesSearch.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.fetchSeriesForResearch()
     }
+
+    val filteredList = searchList.filter { it.name.contains(searchBar, ignoreCase = true) }
+
 
     Column {
         Box(
@@ -92,41 +99,60 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                         cursorColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
-                    )
+                    ),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            viewModel.fetchSeriesASerie(searchBar)
+                        }
+                    ),
                 )
             }
         }
-            LazyColumn(verticalArrangement = Arrangement.SpaceBetween) {
-                items(searchList){
-                    series ->
-                    if(series.name.contains(searchBar, ignoreCase = true)){
-                        Row(modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview))
-                        }){
-                            AsyncImage(
-                                model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .height(135.dp)
-                                    .width(90.dp),
+        LazyColumn(verticalArrangement = Arrangement.SpaceBetween) {
+            items(filteredList) { series ->
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navigator.navigate(
+                                SerieScreenDestination(
+                                    serieName = series.name,
+                                    serieOverview = series.overview
+                                )
                             )
-                            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding( start = 10.dp)) {
-                                Text(series.name, color = Color(0xFFB8C5D6))
-                                Text(series.originCountry.toString().replace("[", "").replace("]",""),color = Color(0xFFB8C5D6))
-                                Text(series.voteAverage.toString() + " / 10",color = Color(0xFFB8C5D6))
-                            }
-                        }
-                        HorizontalDivider(
-                            color = Color(0xFF000000),
-                            thickness = 3.dp,
+                        }) {
+                        AsyncImage(
+                            model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .height(135.dp)
+                                .width(90.dp),
                         )
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(start = 10.dp)
+                        ) {
+                            Text(series.name, color = Color(0xFFB8C5D6))
+                            Text(
+                                series.originCountry.toString().replace("[", "").replace("]", ""),
+                                color = Color(0xFFB8C5D6)
+                            )
+                            Text(series.voteAverage.toString() + " / 10", color = Color(0xFFB8C5D6))
+                        }
                     }
+                    HorizontalDivider(
+                        color = Color(0xFF000000),
+                        thickness = 3.dp,
+                    )
                 }
             }
+        }
 
 
-    }
+
 
 }
+
+
