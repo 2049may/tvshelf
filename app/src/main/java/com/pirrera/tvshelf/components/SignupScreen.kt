@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.HomeScreenDestination
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
 import com.pirrera.tvshelf.destinations.MainScreenDestination
+import com.pirrera.tvshelf.ui.theme.Primary
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -80,7 +82,9 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
             },
             label = {
                 Text("Pseudo")
-            }
+            },
+            textStyle = TextStyle(color = Primary)
+
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -92,7 +96,9 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
             },
             label = {
                 Text("Email")
-            }
+            },
+            textStyle = TextStyle(color = Primary)
+
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -105,6 +111,7 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
             label = {
                 Text("Password")
             },
+            textStyle = TextStyle(color = Primary),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
@@ -119,6 +126,7 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
             label = {
                 Text("Confirm Password")
             },
+            textStyle = TextStyle(color = Primary),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )

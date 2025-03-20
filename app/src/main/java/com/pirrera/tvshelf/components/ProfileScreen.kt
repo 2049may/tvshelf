@@ -42,6 +42,9 @@ import com.google.firebase.auth.auth
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
+import com.pirrera.tvshelf.ui.theme.Primary
+import com.pirrera.tvshelf.ui.theme.Red
+import com.pirrera.tvshelf.ui.theme.Secondary
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
@@ -59,27 +62,27 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
 
         User(pseudo.value)
         HorizontalDivider(
-            color = Color(0xFFB8C5D6),
+            color = Secondary,
             thickness = 1.dp,
         )
 
         FavoriteShows()
         HorizontalDivider(
-            color = Color(0xFFB8C5D6),
+            color = Secondary,
             thickness = 1.dp,
             modifier = Modifier.padding(vertical = 10.dp)
         )
 
         CurrentlyWatching()
         HorizontalDivider(
-            color = Color(0xFFB8C5D6),
+            color = Secondary,
             thickness = 1.dp,
             modifier = Modifier.padding(vertical = 10.dp)
         )
 
         Statistics()
         HorizontalDivider(
-            color = Color(0xFFB8C5D6),
+            color = Secondary,
             thickness = 1.dp
         )
 
@@ -88,7 +91,7 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
             navigator.navigate(LoginScreenDestination)
         }) {
             Text("Log out",
-                color = Color(0xFFB85156),
+                color = Red,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
@@ -142,7 +145,7 @@ fun FavoriteShows() {
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
         Text(
             text = "Favorite Shows",
-            color = Color(0xFFB8C5D6),
+            color = Primary,
             fontSize = 25.sp
         )
 
@@ -164,7 +167,7 @@ fun CurrentlyWatching() {
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
         Text(
             text = "Currently Watching",
-            color = Color(0xFFB8C5D6),
+            color = Primary,
             fontSize = 25.sp
         )
 
@@ -190,7 +193,7 @@ fun Statistics() {
             Text(
                 modifier = Modifier.weight(1f),
                 text = "Episodes this month",
-                color = Color(0xFFB8C5D6),
+                color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
@@ -199,7 +202,7 @@ fun Statistics() {
             Text(
                 modifier = Modifier.weight(1f),
                 text = "51",
-                color = Color(0xFFB8C5D6),
+                color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
@@ -210,7 +213,7 @@ fun Statistics() {
             Text(
                 modifier = Modifier.weight(1f),
                 text = "Now Watching",
-                color = Color(0xFFB8C5D6),
+                color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
@@ -219,7 +222,7 @@ fun Statistics() {
             Text(
                 modifier = Modifier.weight(1f),
                 text = "5 shows",
-                color = Color(0xFFB8C5D6),
+                color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
@@ -230,7 +233,7 @@ fun Statistics() {
             Text(
                 modifier = Modifier.weight(1f),
                 text = "Finished Shows",
-                color = Color(0xFFB8C5D6),
+                color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Start,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
@@ -239,7 +242,7 @@ fun Statistics() {
             Text(
                 modifier = Modifier.weight(1f),
                 text = "13",
-                color = Color(0xFFB8C5D6),
+                color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
@@ -257,7 +260,7 @@ fun BoxSeries(modifier: Modifier = Modifier.width(76.dp)) {
     Box(
         modifier = modifier
             .height(114.dp)
-            .background(color = Color(0xFFB8C5D6))
+            .background(color = Primary)
     )
 }
 
