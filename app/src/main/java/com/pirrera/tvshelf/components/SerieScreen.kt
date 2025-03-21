@@ -29,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -78,18 +79,24 @@ fun SerieScreen(
     posterPath: String?,
     airDate: String?
 ) {
+
+    var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
+    var selectedStars by rememberSaveable { mutableStateOf(0) }
+
+    fun resetRating() {
+        selectedStars = 0
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-        //.windowInsetsPadding(WindowInsets.statusBars)
         ,
         topBar = {
             TopAppBar(
                 modifier = Modifier
                     .statusBarsPadding()
                     .fillMaxWidth()
-                //.height(40.dp)
                 ,
                 title = {
                     Row(
@@ -135,21 +142,20 @@ fun SerieScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
-            Rating(5) { stars ->
-                if (watchState == WatchState.WatchNow) {
-                    watchState = WatchState.Watching
-                }
-            }
+
+
+            Rating(5, selectedStars = selectedStars, onRatingChange = {selectedStars = it})
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                WatchButton(watchState) { newState ->
-                    watchState = newState
-                }
+                WatchButton(
+                    watchState = watchState,
+                    onWatchStateChange = { watchState = it },
+                    onRatingReset = { resetRating() }
+                )
 
                 FavoriteButton()
             }
@@ -210,17 +216,20 @@ fun SerieScreen(
 @Composable
 fun Rating(
     maxStars: Int = 5,
-    onRated: (Int) -> Unit // Callback when rating is confirmed
+    selectedStars: Int,
+    onRatingChange: (Int) -> Unit
 ) {
-    var selectedStars by remember { mutableStateOf(0) }
     var showDialog by remember { mutableStateOf(false) }
-    var tempStars by remember { mutableStateOf(0) }
+    var tempRating by remember { mutableStateOf(selectedStars) }
 
-    Row(horizontalArrangement = Arrangement.spacedBy((-3).dp)) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy((-3).dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         for (i in 1..maxStars) {
             IconButton(onClick = {
-                tempStars = i
-                showDialog = true // Show confirmation dialog
+                tempRating = i
+                showDialog = true
             }) {
                 Icon(
                     painter = painterResource(
@@ -237,19 +246,20 @@ fun Rating(
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Confirm Rating") },
-            text = { Text("Are you sure you want to rate this series $tempStars stars?") },
+            text = { Text("Are you sure you want to give this show a rating of $tempRating stars?") },
             confirmButton = {
-                Button(onClick = {
-                    selectedStars = tempStars
+                TextButton(onClick = {
+                    onRatingChange(tempRating)
                     showDialog = false
-                    onRated(selectedStars) // Notify parent component to update watch state
                 }) {
-                    Text("Confirm")
+                    Text("Yes")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text("Cancel")
+                TextButton(onClick = {
+                    showDialog = false
+                }) {
+                    Text("No")
                 }
             }
         )
@@ -257,20 +267,28 @@ fun Rating(
 }
 
 
+
+
 @Composable
-fun WatchButton(watchState: WatchState, onWatchStateChange: (WatchState) -> Unit) {
+fun WatchButton(watchState: WatchState,
+                onWatchStateChange: (WatchState) -> Unit,
+                onRatingReset: () -> Unit
+) {
     OutlinedButton(
         modifier = Modifier
             .width(150.dp)
             .padding(5.dp),
         onClick = {
-            onWatchStateChange(
-                when (watchState) {
+            val newState = when (watchState) {
                     WatchState.WatchNow -> WatchState.Watching
                     WatchState.Watching -> WatchState.Watched
                     WatchState.Watched -> WatchState.WatchNow
                 }
-            )
+            onWatchStateChange(newState)
+
+            if (newState == WatchState.WatchNow) {
+                onRatingReset()
+            }
         },
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
