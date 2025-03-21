@@ -55,7 +55,6 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
     val searchList by viewModel.seriesSearch.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.fetchSeriesForResearch()
     }
 
     val filteredList = searchList.filter { it.name.contains(searchBar, ignoreCase = true) }
