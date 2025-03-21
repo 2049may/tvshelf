@@ -84,7 +84,7 @@ fun SerieScreen(
     var selectedStars by rememberSaveable { mutableStateOf(0) }
 
     val onRatingConfirmed: () -> Unit = {
-        watchState = WatchState.Watching
+        if (watchState == WatchState.WatchNow) watchState = WatchState.Watching
     }
 
     fun resetRating() {
@@ -134,7 +134,8 @@ fun SerieScreen(
                 .fillMaxSize()
                 .verticalScroll(
                     rememberScrollState()
-                ),
+                )
+                .background(Background),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AsyncImage(
