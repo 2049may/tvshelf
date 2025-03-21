@@ -91,7 +91,11 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
                             .height(150.dp)
                             .width(100.dp)
                             .clickable {
-                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview, posterPath = series.posterPath))
+                                navigator.navigate(SerieScreenDestination(
+                                    serieName = series.name,
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate))
                             }
                     )
                 }
@@ -115,7 +119,11 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
                             .clickable {
-                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview, posterPath = series.posterPath))
+                                navigator.navigate(SerieScreenDestination(
+                                    serieName = series.name,
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate))
                             },
                     )
                 }
@@ -137,7 +145,11 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
                             .clickable {
-                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview, posterPath = series.posterPath))
+                                navigator.navigate(SerieScreenDestination(
+                                    serieName = series.name,
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate))
                             },
                     )
                 }
@@ -159,7 +171,11 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
                             .clickable {
-                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview, posterPath = series.posterPath))
+                                navigator.navigate(SerieScreenDestination(
+                                    serieName = series.name,
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate))
                             },
                     )
                 }
@@ -181,7 +197,11 @@ fun HomeScreen(navigator: DestinationsNavigator, viewModel: ApiViewModel = viewM
                         modifier = Modifier.height(150.dp)
                             .width(100.dp)
                             .clickable {
-                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview, posterPath = series.posterPath))
+                                navigator.navigate(SerieScreenDestination(
+                                    serieName = series.name,
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate))
                             },
                     )
                 }

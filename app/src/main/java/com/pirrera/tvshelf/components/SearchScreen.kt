@@ -103,7 +103,11 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                         Row(modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                navigator.navigate(SerieScreenDestination(serieName = series.name, serieOverview = series.overview, posterPath = series.posterPath))
+                                navigator.navigate(SerieScreenDestination(
+                                    serieName = series.name,
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate))
                         }){
                             AsyncImage(
                                 model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,

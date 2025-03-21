@@ -16,10 +16,13 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -30,12 +33,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -48,9 +53,12 @@ import com.pirrera.tvshelf.data.Series
 import com.pirrera.tvshelf.destinations.HomeScreenDestination
 import com.pirrera.tvshelf.destinations.MainScreenDestination
 import com.pirrera.tvshelf.destinations.SerieScreenDestination
+import com.pirrera.tvshelf.model.WatchState
 import com.pirrera.tvshelf.ui.theme.Background
 import com.pirrera.tvshelf.ui.theme.Primary
 import com.pirrera.tvshelf.ui.theme.Red
+import com.pirrera.tvshelf.ui.theme.Secondary
+import com.pirrera.tvshelf.ui.theme.Tertiary
 import com.pirrera.tvshelf.ui.theme.Yellow
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -65,7 +73,8 @@ fun SerieScreen(
     navigator: DestinationsNavigator,
     serieName: String,
     serieOverview: String,
-    posterPath: String?
+    posterPath: String?,
+    airDate : String?
 ) {
     Scaffold(
         modifier = Modifier
@@ -82,7 +91,7 @@ fun SerieScreen(
                 title = {
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = serieName,
+                            text = "",
                             fontSize = 18.sp,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
@@ -99,13 +108,15 @@ fun SerieScreen(
 
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.padding(innerPadding).fillMaxSize().verticalScroll(
+            rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally) {
             AsyncImage(
                 model = "https://image.tmdb.org/t/p/w500/$posterPath",
                 contentDescription = null,
                 modifier = Modifier
-                    .height(330.dp)
-                    .width(220.dp),
+                    .height(315.dp)
+                    .width(210.dp),
             )
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -117,6 +128,72 @@ fun SerieScreen(
                 WatchButton()
                 FavoriteButton()
             }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = serieName,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Tertiary,
+                modifier = Modifier.padding(horizontal = 30.dp, vertical = 10.dp),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
+
+            Column(modifier = Modifier.padding(vertical = 5.dp)) {
+
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)) {
+                    if (airDate != null) {
+                        Text(
+                            text = airDate.trim().substring(0, 4),
+                            fontSize = 16.sp,
+                            color = Primary,
+                            textAlign = TextAlign.Left,
+                        )
+                    }
+                }
+
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)) {
+                    Text(
+                        text = "DIRECTED BY",
+                        fontSize = 14.sp,
+                        color = Primary,
+                        textAlign = TextAlign.Left,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text(
+                        text = "dddd",
+                        textAlign = TextAlign.Right,
+                        modifier = Modifier.weight(1f)
+
+                    )
+                }
+            }
+
+            HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "Synopsis",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Primary,
+                textAlign = TextAlign.Left,
+                modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
+            )
+
+            Text(
+                text = serieOverview,
+                fontSize = 16.sp,
+                color = Tertiary,
+                modifier = Modifier.padding(horizontal = 30.dp),
+                textAlign = TextAlign.Justify
+            )
 
         }
     }
@@ -148,23 +225,22 @@ fun Rating(maxStars : Int = 5, posterWidth: Int = 220) {
 @Composable
 fun WatchButton() {
 
-    var watching by remember { mutableStateOf(false) }
-
+    var state by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
     OutlinedButton(
         modifier = Modifier.width(150.dp)
             .padding(5.dp),
-        onClick = { watching = !watching },
+        onClick = { if (state == WatchState.WatchNow) state = WatchState.Watching else state = WatchState.WatchNow },
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (watching) Primary else Color.Transparent,
-            contentColor = if (watching) Background else Primary
+            containerColor = if (state == WatchState.Watching) Primary else Color.Transparent,
+            contentColor = if (state == WatchState.Watching) Background else Primary
         ),
         elevation = ButtonDefaults.buttonElevation(5.dp),
-        border = (if (!watching) Primary else null)?.let { BorderStroke(2.dp, it) },
+        border = (if (state != WatchState.Watching) Primary else null)?.let { BorderStroke(2.dp, it) },
     ) {
         Text(fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
-            text = if (watching) {
+            text = if (state == WatchState.Watching) {
             "Watching"
         } else "Watch Now")
     }
@@ -199,5 +275,4 @@ fun FavoriteButton() {
 @Composable
 fun WatchButtonPreview() {
     WatchButton()
-
 }
