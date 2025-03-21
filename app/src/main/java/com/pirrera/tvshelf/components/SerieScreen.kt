@@ -84,7 +84,8 @@ fun SerieScreen(
                 ,
         topBar = {
             TopAppBar(
-                modifier = Modifier.statusBarsPadding()
+                modifier = Modifier
+                    .statusBarsPadding()
                     .fillMaxWidth()
                     //.height(40.dp)
                         ,
@@ -108,8 +109,12 @@ fun SerieScreen(
 
         }
     ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding).fillMaxSize().verticalScroll(
-            rememberScrollState()),
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
+            .verticalScroll(
+                rememberScrollState()
+            ),
             horizontalAlignment = Alignment.CenterHorizontally) {
             AsyncImage(
                 model = "https://image.tmdb.org/t/p/w500/$posterPath",
@@ -144,36 +149,7 @@ fun SerieScreen(
 
             HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
 
-            Column(modifier = Modifier.padding(vertical = 5.dp)) {
-
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)) {
-                    if (airDate != null) {
-                        Text(
-                            text = airDate.trim().substring(0, 4),
-                            fontSize = 16.sp,
-                            color = Primary,
-                            textAlign = TextAlign.Left,
-                        )
-                    }
-                }
-
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp)) {
-                    Text(
-                        text = "DIRECTED BY",
-                        fontSize = 14.sp,
-                        color = Primary,
-                        textAlign = TextAlign.Left,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Text(
-                        text = "dddd",
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.weight(1f)
-
-                    )
-                }
-            }
+            Informations(airDate)
 
             HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
             Spacer(modifier = Modifier.height(10.dp))
@@ -184,7 +160,9 @@ fun SerieScreen(
                 fontWeight = FontWeight.Bold,
                 color = Primary,
                 textAlign = TextAlign.Left,
-                modifier = Modifier.padding(horizontal = 30.dp).fillMaxWidth()
+                modifier = Modifier
+                    .padding(horizontal = 30.dp)
+                    .fillMaxWidth()
             )
 
             Text(
@@ -194,6 +172,8 @@ fun SerieScreen(
                 modifier = Modifier.padding(horizontal = 30.dp),
                 textAlign = TextAlign.Justify
             )
+
+            Spacer(modifier = Modifier.height(10.dp))
 
         }
     }
@@ -227,7 +207,8 @@ fun WatchButton() {
 
     var state by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
     OutlinedButton(
-        modifier = Modifier.width(150.dp)
+        modifier = Modifier
+            .width(150.dp)
             .padding(5.dp),
         onClick = { if (state == WatchState.WatchNow) state = WatchState.Watching else state = WatchState.WatchNow },
         shape = RoundedCornerShape(8.dp),
@@ -260,6 +241,56 @@ fun FavoriteButton() {
             tint = Red)
     }
 
+}
+
+@Composable
+fun Informations(airDate: String?) {
+    Column(modifier = Modifier.padding(vertical = 5.dp)) {
+
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp, vertical = 5.dp)) {
+
+            Text(
+                text = "X seasons", //TODO : recuperer le nombre de saisons
+                fontSize = 16.sp,
+                color = Primary,
+                textAlign = TextAlign.Left,
+                modifier = Modifier.weight(1f)
+            )
+
+            if (airDate != null) {
+                Text(
+                    text = airDate.trim().substring(0, 4),
+                    fontSize = 16.sp,
+                    color = Primary,
+                    textAlign = TextAlign.Right,
+                )
+            }
+        }
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp, vertical = 5.dp)) {
+
+                Text(
+                    text = "DIRECTED BY",
+                    fontSize = 14.sp,
+                    color = Primary,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Text(
+                    text = "dddd", // TODO : recuperer le réal
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.weight(1f)
+
+                )
+
+        }
+    }
 }
 
 //@Preview
