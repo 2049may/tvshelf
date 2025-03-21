@@ -178,11 +178,17 @@ fun CurrentlyWatching() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(15) {
-                BoxSeries()
+                BoxSeries(modifier = Modifier.width(76.dp))
             }
+
         }
+
+
     }
 }
+
+
+
 
 @Composable
 fun Statistics() {
@@ -256,7 +262,7 @@ fun Statistics() {
 
 
 @Composable
-fun BoxSeries(modifier: Modifier = Modifier.width(76.dp)) {
+fun BoxSeries(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .height(114.dp)
