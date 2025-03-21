@@ -45,6 +45,8 @@ import com.pirrera.tvshelf.auth.AuthState
 import com.pirrera.tvshelf.data.Series
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
 import com.pirrera.tvshelf.destinations.SerieScreenDestination
+import com.pirrera.tvshelf.ui.theme.Primary
+import com.pirrera.tvshelf.ui.theme.Secondary
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Destination
@@ -89,7 +91,7 @@ fun HomeScreen(
             .padding(horizontal = 8.dp)
     ) {
         Box(modifier = Modifier.padding(top = 30.dp)) {
-            Text("Action", color = Color(0xFFB8C5D6), fontSize = 22.sp)
+            Text("Action", color = Primary, fontSize = 22.sp)
             when {
                 isActionLoading -> {
                     Preloader()
@@ -99,12 +101,10 @@ fun HomeScreen(
                     ListeSerie(actionAdventureList, navigator)
                 }
             }
-
-
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Science Fiction", color = Color(0xFFB8C5D6), fontSize = 22.sp)
+            Text("Science Fiction", color = Primary, fontSize = 22.sp)
 
             when {
                 isActionLoading -> {
@@ -118,7 +118,7 @@ fun HomeScreen(
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Crime", color = Color(0xFFB8C5D6), fontSize = 22.sp)
+            Text("Crime", color = Primary, fontSize = 22.sp)
             when {
                 isActionLoading -> {
                     Preloader()
@@ -131,7 +131,7 @@ fun HomeScreen(
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Comedy", color = Color(0xFFB8C5D6), fontSize = 22.sp)
+            Text("Comedy", color = Primary, fontSize = 22.sp)
             when {
                 isActionLoading -> {
                     Preloader()
@@ -144,7 +144,7 @@ fun HomeScreen(
         }
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            Text("Drama", color = Color(0xFFB8C5D6), fontSize = 22.sp)
+            Text("Drama", color = Primary, fontSize = 22.sp)
             when {
                 isActionLoading -> {
                     Preloader()
@@ -171,7 +171,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .width(100.dp)
                         .height(150.dp)
-                        .background(Color(0xFFB8C5D6))
+                        .background( color = Secondary)
                 ) {
                 }
             }
@@ -199,7 +199,9 @@ fun HomeScreen(
                             navigator.navigate(
                                 SerieScreenDestination(
                                     serieName = series.name,
-                                    serieOverview = series.overview
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate
                                 )
                             )
                         },
@@ -221,7 +223,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .width(100.dp)
                         .height(150.dp)
-                        .background(Color(0xFF2D3339))
+                        .background(color = Secondary)
                 ) {
                 }
             }

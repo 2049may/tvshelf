@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,11 +45,10 @@ import com.pirrera.tvshelf.components.HomeScreen
 import com.pirrera.tvshelf.components.ProfileScreen
 import com.pirrera.tvshelf.components.SearchScreen
 import com.pirrera.tvshelf.ui.theme.TVshelfTheme
-//import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
-//import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.pirrera.tvshelf.auth.FirebaseEmulatorConfig
-//import com.pirrera.tvshelf.components.NavGraphs
+import com.pirrera.tvshelf.ui.theme.Background
+import com.pirrera.tvshelf.ui.theme.Secondary
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.dependency
@@ -78,9 +78,10 @@ class MainActivity : ComponentActivity() {
 
 @Destination
 @Composable
-fun MainScreen(navigator: DestinationsNavigator) {
-    var selectedIcon by remember { mutableStateOf<String?>("home") }
+fun MainScreen(
+    navigator: DestinationsNavigator) {
 
+    var selectedIcon by rememberSaveable { mutableStateOf("home") }
     val networkRequest = NetworkRequest.Builder()
         .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
@@ -108,11 +109,11 @@ fun MainScreen(navigator: DestinationsNavigator) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xff212529)),
+            .background(Background),
         bottomBar = {
             NavigationBar {
                 BottomAppBar(
-                    containerColor = Color(0xFF2D3339),
+                    containerColor = Secondary,
                     tonalElevation = 8.dp,
                     actions = {
                         Row(
@@ -144,7 +145,7 @@ fun MainScreen(navigator: DestinationsNavigator) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xff212529))
+                .background(Background)
                 .padding(innerPadding)
         ) {
             when (selectedIcon) {
@@ -167,7 +168,7 @@ fun BottomAppBarButton(
         "search" -> R.drawable.glass
         "profile" -> R.drawable.profile
         "home" -> R.drawable.home
-        else -> R.drawable.glass // Default icon
+        else -> R.drawable.glass
     }
 
     IconButton(onClick = onIconClick) {

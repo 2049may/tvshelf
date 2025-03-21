@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.auth.AuthState
@@ -37,7 +40,10 @@ import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.HomeScreenDestination
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
 import com.pirrera.tvshelf.destinations.MainScreenDestination
+import com.pirrera.tvshelf.ui.theme.Background
 import com.pirrera.tvshelf.ui.theme.Primary
+import com.pirrera.tvshelf.ui.theme.Secondary
+import com.pirrera.tvshelf.ui.theme.Tertiary
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -55,7 +61,12 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.Authenticated -> navigator.navigate(MainScreenDestination)
-            is AuthState.Error -> Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            is AuthState.Error -> Toast.makeText(
+                context,
+                (authState.value as AuthState.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
             else -> Unit
         }
 
@@ -64,7 +75,7 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xff212529)),
+            .background(Background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -133,15 +144,23 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB8C5D6)),
+        Button(
+            colors = ButtonDefaults.buttonColors(containerColor = Primary),
             onClick = {
                 if (password != confirmPassword) {
                     Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
                     return@Button
                 } else authViewModel.signup(pseudo, email, password)
             },
-            enabled = authState.value != AuthState.Loading) {
-            Text("Create Account")
+            enabled = authState.value != AuthState.Loading,
+            shape = RoundedCornerShape(8.dp)
+
+
+        ) {
+            Text("Create Account",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                color = Background)
         }
         Spacer(
             modifier = Modifier
@@ -151,7 +170,7 @@ fun SignupScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel)
         TextButton(onClick = {
             navigator.navigate(LoginScreenDestination)
         }) {
-            Text("Already have an account? Log in", color = Color(0xFFB8C5D6))
+            Text("Already have an account? Log in", color = Tertiary)
         }
 
     }

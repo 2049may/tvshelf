@@ -1,23 +1,309 @@
 package com.pirrera.tvshelf.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.data.Series
 import com.pirrera.tvshelf.destinations.HomeScreenDestination
+import com.pirrera.tvshelf.destinations.MainScreenDestination
 import com.pirrera.tvshelf.destinations.SerieScreenDestination
+import com.pirrera.tvshelf.model.WatchState
+import com.pirrera.tvshelf.ui.theme.Background
+import com.pirrera.tvshelf.ui.theme.Primary
+import com.pirrera.tvshelf.ui.theme.Red
+import com.pirrera.tvshelf.ui.theme.Secondary
+import com.pirrera.tvshelf.ui.theme.Tertiary
+import com.pirrera.tvshelf.ui.theme.Yellow
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.result.ResultRecipient
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
-fun SerieScreen(navigator: DestinationsNavigator, serieName : String,serieOverview : String){
-    Column {
-        Text(serieName)
-        Text(serieOverview)
+fun SerieScreen(
+    navigator: DestinationsNavigator,
+    serieName: String,
+    serieOverview: String,
+    posterPath: String?,
+    airDate : String?
+) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Background)
+            //.windowInsetsPadding(WindowInsets.statusBars)
+                ,
+        topBar = {
+            TopAppBar(
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .fillMaxWidth()
+                    //.height(40.dp)
+                        ,
+                title = {
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "",
+                            fontSize = 18.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navigator.popBackStack() }) {
+                        Icon(painter = painterResource(id = R.drawable.back), contentDescription = "Back")
+                    }
+                }
+            )
+
+        }
+    ) { innerPadding ->
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
+            .verticalScroll(
+                rememberScrollState()
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                model = "https://image.tmdb.org/t/p/w500/$posterPath",
+                contentDescription = null,
+                modifier = Modifier
+                    .height(315.dp)
+                    .width(210.dp),
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Rating(5)
+
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()) {
+                WatchButton()
+                FavoriteButton()
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = serieName,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Tertiary,
+                modifier = Modifier.padding(horizontal = 30.dp, vertical = 10.dp),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
+
+            Informations(airDate)
+
+            HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "Synopsis",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Primary,
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .padding(horizontal = 30.dp)
+                    .fillMaxWidth()
+            )
+
+            Text(
+                text = serieOverview,
+                fontSize = 16.sp,
+                color = Tertiary,
+                modifier = Modifier.padding(horizontal = 30.dp),
+                textAlign = TextAlign.Justify
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+        }
+    }
+}
+
+@Composable
+fun Rating(maxStars : Int = 5, posterWidth: Int = 220) {
+    var selectedStars by remember { mutableStateOf(0) }
+
+    Row(
+       // modifier = Modifier.width((posterWidth).dp),
+        horizontalArrangement =  Arrangement.spacedBy((-3).dp)
+    ) {
+        for (i in 1..maxStars) {
+            IconButton(onClick = { selectedStars = i }) {
+                Icon(
+                    painter = painterResource(
+                        id = if (i <= selectedStars) R.drawable.filledstar else R.drawable.emptystar
+                    ),
+                    contentDescription = "Star $i",
+                    tint = Yellow
+                )
+            }
+        }
+
+    }
+}
+
+@Composable
+fun WatchButton() {
+
+    var state by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
+    OutlinedButton(
+        modifier = Modifier
+            .width(150.dp)
+            .padding(5.dp),
+        onClick = { if (state == WatchState.WatchNow) state = WatchState.Watching else state = WatchState.WatchNow },
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (state == WatchState.Watching) Primary else Color.Transparent,
+            contentColor = if (state == WatchState.Watching) Background else Primary
+        ),
+        elevation = ButtonDefaults.buttonElevation(5.dp),
+        border = (if (state != WatchState.Watching) Primary else null)?.let { BorderStroke(2.dp, it) },
+    ) {
+        Text(fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            text = if (state == WatchState.Watching) {
+            "Watching"
+        } else "Watch Now")
     }
 
+}
+
+@Composable
+fun FavoriteButton() {
+    var favorite by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { favorite = !favorite }) {
+        Icon(
+            painter = painterResource(
+                id = if (favorite) R.drawable.filledheart else R.drawable.emptyheart
+            ),
+            contentDescription = "Favorite",
+            tint = Red)
+    }
+
+}
+
+@Composable
+fun Informations(airDate: String?) {
+    Column(modifier = Modifier.padding(vertical = 5.dp)) {
+
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp, vertical = 5.dp)) {
+
+            Text(
+                text = "X seasons", //TODO : recuperer le nombre de saisons
+                fontSize = 16.sp,
+                color = Primary,
+                textAlign = TextAlign.Left,
+                modifier = Modifier.weight(1f)
+            )
+
+            if (airDate != null) {
+                Text(
+                    text = airDate.trim().substring(0, 4),
+                    fontSize = 16.sp,
+                    color = Primary,
+                    textAlign = TextAlign.Right,
+                )
+            }
+        }
+
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp, vertical = 5.dp)) {
+
+                Text(
+                    text = "DIRECTED BY",
+                    fontSize = 14.sp,
+                    color = Primary,
+                    textAlign = TextAlign.Left,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Text(
+                    text = "dddd", // TODO : recuperer le réal
+                    textAlign = TextAlign.Right,
+                    modifier = Modifier.weight(1f)
+
+                )
+
+        }
+    }
+}
+
+//@Preview
+//@Composable
+//fun RatingPreview() {
+//
+//    Rating()
+//
+//}
+
+
+@Preview(showBackground = true)
+@Composable
+fun WatchButtonPreview() {
+    WatchButton()
 }

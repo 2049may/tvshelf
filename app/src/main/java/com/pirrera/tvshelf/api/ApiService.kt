@@ -67,8 +67,8 @@ interface ApiService {
     suspend fun getASerie(
         @Query("query") film: String,
         @Query("api_key") apiKey: String = "232c2294d3026daa9a8273d9c624c4d8",
-        @Query("language") language: String = "en-En",
-        @Query("append_to_response") elt : String = "episode_groups"
+        @Query("append_to_response") elt : String = "episode_groups",
+        @Query("language") language: String = "en-EN"
     ): SeriesData
 
 

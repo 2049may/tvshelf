@@ -46,6 +46,8 @@ import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.api.ApiViewModel
 import com.pirrera.tvshelf.destinations.Destination
 import com.pirrera.tvshelf.destinations.SerieScreenDestination
+import com.pirrera.tvshelf.ui.theme.Primary
+import com.pirrera.tvshelf.ui.theme.Secondary
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @com.ramcosta.composedestinations.annotation.Destination
@@ -64,7 +66,7 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF2D3339))
+                .background(Secondary)
                 .padding(horizontal = 10.dp, vertical = 5.dp)
         ) {
             Row(
@@ -87,14 +89,14 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                     onValueChange = { searchBar = it },
                     modifier = Modifier
                         .weight(1f)
-                        .background(Color(0xFF2D3339))
+                        .background(Secondary)
                         .height(50.dp),
-                    textStyle = TextStyle(color = Color(0xFFB8C5D6), fontSize = 18.sp),
-                    placeholder = { Text("Search...", color = Color(0xFFB8C5D6)) },
+                    textStyle = TextStyle(color = Primary, fontSize = 18.sp),
+                    placeholder = { Text("Search...", color = Primary) },
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF2D3339),
-                        unfocusedContainerColor = Color(0xFF2D3339),
-                        disabledContainerColor = Color(0xFF2D3339),
+                        focusedContainerColor = Secondary,
+                        unfocusedContainerColor = Secondary,
+                        disabledContainerColor = Secondary,
                         cursorColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
@@ -118,7 +120,9 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                             navigator.navigate(
                                 SerieScreenDestination(
                                     serieName = series.name,
-                                    serieOverview = series.overview
+                                    serieOverview = series.overview,
+                                    posterPath = series.posterPath,
+                                    airDate = series.firstAirDate
                                 )
                             )
                         }) {
@@ -133,12 +137,12 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                             verticalArrangement = Arrangement.Center,
                             modifier = Modifier.padding(start = 10.dp)
                         ) {
-                            Text(series.name, color = Color(0xFFB8C5D6))
+                            Text(series.name, color = Primary)
                             Text(
                                 series.originCountry.toString().replace("[", "").replace("]", ""),
-                                color = Color(0xFFB8C5D6)
+                                color = Primary
                             )
-                            Text(series.voteAverage.toString() + " / 10", color = Color(0xFFB8C5D6))
+                            Text(series.voteAverage.toString() + " / 10", color = Primary)
                         }
                     }
                     HorizontalDivider(
@@ -153,5 +157,4 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
 
 
 }
-
 
