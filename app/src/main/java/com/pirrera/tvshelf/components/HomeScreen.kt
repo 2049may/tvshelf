@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -63,7 +64,6 @@ fun HomeScreen(
     val authState = authViewModel.authState.observeAsState()
     var imageState by remember { mutableStateOf("loading") }
 
-    //Preloader
     val isActionLoading by viewModel.isActionLoading.collectAsState()
     val isFictionLoading by viewModel.isFictionLoading.collectAsState()
     LaunchedEffect(authState.value) {
@@ -102,8 +102,6 @@ fun HomeScreen(
 
 
         }
-
-
 
         Box(modifier = Modifier.padding(top = 10.dp)) {
             Text("Science Fiction", color = Color(0xFFB8C5D6), fontSize = 22.sp)
@@ -223,7 +221,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .width(100.dp)
                         .height(150.dp)
-                        .background(Color(0xFFB8C5D6))
+                        .background(Color(0xFF2D3339))
                 ) {
                 }
             }

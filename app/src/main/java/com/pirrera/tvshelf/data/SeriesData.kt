@@ -23,5 +23,7 @@ data class Series(
     @SerializedName("first_air_date") val firstAirDate: String,
     @SerializedName("name") val name: String,
     @SerializedName("vote_average") val voteAverage: Double,
-    @SerializedName("vote_count") val voteCount: Int
+    @SerializedName("vote_count") val voteCount: Int,
+    @SerializedName("number_of_episodes") val numberEpisodes: Int,
+    @SerializedName("number_of_seasons") val numberSeasons: Int
 )
