@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,6 +56,7 @@ import com.pirrera.tvshelf.destinations.MainScreenDestination
 import com.pirrera.tvshelf.destinations.SerieScreenDestination
 import com.pirrera.tvshelf.model.WatchState
 import com.pirrera.tvshelf.ui.theme.Background
+import com.pirrera.tvshelf.ui.theme.Green
 import com.pirrera.tvshelf.ui.theme.Primary
 import com.pirrera.tvshelf.ui.theme.Red
 import com.pirrera.tvshelf.ui.theme.Secondary
@@ -74,23 +76,26 @@ fun SerieScreen(
     serieName: String,
     serieOverview: String,
     posterPath: String?,
-    airDate : String?
+    airDate: String?
 ) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-            //.windowInsetsPadding(WindowInsets.statusBars)
-                ,
+        //.windowInsetsPadding(WindowInsets.statusBars)
+        ,
         topBar = {
             TopAppBar(
                 modifier = Modifier
                     .statusBarsPadding()
                     .fillMaxWidth()
-                    //.height(40.dp)
-                        ,
+                //.height(40.dp)
+                ,
                 title = {
-                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = "",
                             fontSize = 18.sp,
@@ -102,20 +107,25 @@ fun SerieScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = { navigator.popBackStack() }) {
-                        Icon(painter = painterResource(id = R.drawable.back), contentDescription = "Back")
+                        Icon(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Back"
+                        )
                     }
                 }
             )
 
         }
     ) { innerPadding ->
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()
-            .verticalScroll(
-                rememberScrollState()
-            ),
-            horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .verticalScroll(
+                    rememberScrollState()
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             AsyncImage(
                 model = "https://image.tmdb.org/t/p/w500/$posterPath",
                 contentDescription = null,
@@ -125,12 +135,22 @@ fun SerieScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            Rating(5)
+            var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
+            Rating(5) { stars ->
+                if (watchState == WatchState.WatchNow) {
+                    watchState = WatchState.Watching
+                }
+            }
 
-            Row(verticalAlignment = Alignment.CenterVertically,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()) {
-                WatchButton()
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                WatchButton(watchState) { newState ->
+                    watchState = newState
+                }
+
                 FavoriteButton()
             }
 
@@ -147,11 +167,19 @@ fun SerieScreen(
 
             Spacer(modifier = Modifier.height(5.dp))
 
-            HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
+            HorizontalDivider(
+                color = Secondary,
+                thickness = 2.dp,
+                modifier = Modifier.padding(horizontal = 30.dp)
+            )
 
             Informations(airDate)
 
-            HorizontalDivider(color = Secondary, thickness = 2.dp, modifier = Modifier.padding(horizontal = 30.dp))
+            HorizontalDivider(
+                color = Secondary,
+                thickness = 2.dp,
+                modifier = Modifier.padding(horizontal = 30.dp)
+            )
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
@@ -180,15 +208,20 @@ fun SerieScreen(
 }
 
 @Composable
-fun Rating(maxStars : Int = 5, posterWidth: Int = 220) {
+fun Rating(
+    maxStars: Int = 5,
+    onRated: (Int) -> Unit // Callback when rating is confirmed
+) {
     var selectedStars by remember { mutableStateOf(0) }
+    var showDialog by remember { mutableStateOf(false) }
+    var tempStars by remember { mutableStateOf(0) }
 
-    Row(
-       // modifier = Modifier.width((posterWidth).dp),
-        horizontalArrangement =  Arrangement.spacedBy((-3).dp)
-    ) {
+    Row(horizontalArrangement = Arrangement.spacedBy((-3).dp)) {
         for (i in 1..maxStars) {
-            IconButton(onClick = { selectedStars = i }) {
+            IconButton(onClick = {
+                tempStars = i
+                showDialog = true // Show confirmation dialog
+            }) {
                 Icon(
                     painter = painterResource(
                         id = if (i <= selectedStars) R.drawable.filledstar else R.drawable.emptystar
@@ -198,35 +231,79 @@ fun Rating(maxStars : Int = 5, posterWidth: Int = 220) {
                 )
             }
         }
+    }
 
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Confirm Rating") },
+            text = { Text("Are you sure you want to rate this series $tempStars stars?") },
+            confirmButton = {
+                Button(onClick = {
+                    selectedStars = tempStars
+                    showDialog = false
+                    onRated(selectedStars) // Notify parent component to update watch state
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
-@Composable
-fun WatchButton() {
 
-    var state by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
+@Composable
+fun WatchButton(watchState: WatchState, onWatchStateChange: (WatchState) -> Unit) {
     OutlinedButton(
         modifier = Modifier
             .width(150.dp)
             .padding(5.dp),
-        onClick = { if (state == WatchState.WatchNow) state = WatchState.Watching else state = WatchState.WatchNow },
+        onClick = {
+            onWatchStateChange(
+                when (watchState) {
+                    WatchState.WatchNow -> WatchState.Watching
+                    WatchState.Watching -> WatchState.Watched
+                    WatchState.Watched -> WatchState.WatchNow
+                }
+            )
+        },
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (state == WatchState.Watching) Primary else Color.Transparent,
-            contentColor = if (state == WatchState.Watching) Background else Primary
+            containerColor = when (watchState) {
+                WatchState.WatchNow, WatchState.Watched -> Color.Transparent
+                WatchState.Watching -> Primary
+            },
+            contentColor = when (watchState) {
+                WatchState.WatchNow -> Primary
+                WatchState.Watching -> Background
+                WatchState.Watched -> Green
+            }
         ),
         elevation = ButtonDefaults.buttonElevation(5.dp),
-        border = (if (state != WatchState.Watching) Primary else null)?.let { BorderStroke(2.dp, it) },
+        border = when (watchState) {
+            WatchState.WatchNow -> BorderStroke(2.dp, Primary)
+            WatchState.Watched -> BorderStroke(2.dp, Green)
+            WatchState.Watching -> BorderStroke(2.dp, Primary)
+        }
     ) {
-        Text(fontWeight = FontWeight.Bold,
+        Text(
+            fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
-            text = if (state == WatchState.Watching) {
-            "Watching"
-        } else "Watch Now")
+            text = when (watchState) {
+                WatchState.Watching -> "Watching"
+                WatchState.Watched -> "Watched"
+                else -> "Watch Now"
+            }
+        )
     }
-
 }
+
+
 
 @Composable
 fun FavoriteButton() {
@@ -238,7 +315,8 @@ fun FavoriteButton() {
                 id = if (favorite) R.drawable.filledheart else R.drawable.emptyheart
             ),
             contentDescription = "Favorite",
-            tint = Red)
+            tint = Red
+        )
     }
 
 }
@@ -248,9 +326,11 @@ fun Informations(airDate: String?) {
     Column(modifier = Modifier.padding(vertical = 5.dp)) {
 
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp, vertical = 5.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp, vertical = 5.dp)
+        ) {
 
             Text(
                 text = "X seasons", //TODO : recuperer le nombre de saisons
@@ -270,24 +350,26 @@ fun Informations(airDate: String?) {
             }
         }
 
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp, vertical = 5.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp, vertical = 5.dp)
+        ) {
 
-                Text(
-                    text = "DIRECTED BY",
-                    fontSize = 14.sp,
-                    color = Primary,
-                    textAlign = TextAlign.Left,
-                    modifier = Modifier.weight(1f)
-                )
+            Text(
+                text = "DIRECTED BY",
+                fontSize = 14.sp,
+                color = Primary,
+                textAlign = TextAlign.Left,
+                modifier = Modifier.weight(1f)
+            )
 
-                Text(
-                    text = "dddd", // TODO : recuperer le réal
-                    textAlign = TextAlign.Right,
-                    modifier = Modifier.weight(1f)
+            Text(
+                text = "dddd", // TODO : recuperer le réal
+                textAlign = TextAlign.Right,
+                modifier = Modifier.weight(1f)
 
-                )
+            )
 
         }
     }
@@ -305,5 +387,5 @@ fun Informations(airDate: String?) {
 @Preview(showBackground = true)
 @Composable
 fun WatchButtonPreview() {
-    WatchButton()
+
 }
