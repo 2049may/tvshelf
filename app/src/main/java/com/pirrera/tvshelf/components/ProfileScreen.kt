@@ -73,7 +73,29 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
             modifier = Modifier.padding(vertical = 10.dp)
         )
 
-        CurrentlyWatching()
+//        CurrentlyWatching()
+
+        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
+            Text(
+                text = "Currently Watching",
+                color = Primary,
+                fontSize = 25.sp
+            )
+
+            LazyRow(
+                verticalAlignment = Alignment.Top,
+                contentPadding = PaddingValues(vertical = 5.dp),
+                modifier = Modifier
+                    .padding(top = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(15) {
+                    BoxSeries()
+                }
+            }
+        }
+
+
         HorizontalDivider(
             color = Secondary,
             thickness = 1.dp,
@@ -178,7 +200,11 @@ fun CurrentlyWatching() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(15) {
-                BoxSeries()
+                Box(
+                    modifier = Modifier
+                        .height(114.dp)
+                        .background(color = Primary)
+                )
             }
         }
     }
@@ -253,8 +279,6 @@ fun Statistics() {
     }
 }
 
-
-
 @Composable
 fun BoxSeries(modifier: Modifier = Modifier.width(76.dp)) {
     Box(
@@ -263,10 +287,3 @@ fun BoxSeries(modifier: Modifier = Modifier.width(76.dp)) {
             .background(color = Primary)
     )
 }
-
-
-//@Preview
-//@Composable
-//fun ProfileScreenPreview() {
-//    ProfileScreen(navigator = DestinationsNavigator)
-//}
