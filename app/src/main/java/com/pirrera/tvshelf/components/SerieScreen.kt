@@ -83,6 +83,10 @@ fun SerieScreen(
     var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
     var selectedStars by rememberSaveable { mutableStateOf(0) }
 
+    val onRatingConfirmed: () -> Unit = {
+        watchState = WatchState.Watching
+    }
+
     fun resetRating() {
         selectedStars = 0
     }
@@ -144,7 +148,9 @@ fun SerieScreen(
 
 
 
-            Rating(5, selectedStars = selectedStars, onRatingChange = {selectedStars = it})
+            Rating(5, selectedStars = selectedStars,
+                onRatingChange = {selectedStars = it},
+                onRatingConfirm = {onRatingConfirmed()})
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -217,7 +223,8 @@ fun SerieScreen(
 fun Rating(
     maxStars: Int = 5,
     selectedStars: Int,
-    onRatingChange: (Int) -> Unit
+    onRatingChange: (Int) -> Unit,
+    onRatingConfirm: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var tempRating by remember { mutableStateOf(selectedStars) }
@@ -250,6 +257,7 @@ fun Rating(
             confirmButton = {
                 TextButton(onClick = {
                     onRatingChange(tempRating)
+                    onRatingConfirm()
                     showDialog = false
                 }) {
                     Text("Yes")
