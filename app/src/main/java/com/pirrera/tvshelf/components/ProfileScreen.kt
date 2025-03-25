@@ -1,6 +1,8 @@
 package com.pirrera.tvshelf.components
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,28 +19,38 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
@@ -53,6 +65,7 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel = viewModel()) {
 
     val user = Firebase.auth.currentUser
+    val userId = user?.uid
     val pseudo = remember { mutableStateOf(user?.displayName?:"oula") }
 
     Column(
@@ -66,14 +79,14 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
             thickness = 1.dp,
         )
 
-        FavoriteShows()
+        FavoriteShows(userId)
         HorizontalDivider(
             color = Secondary,
             thickness = 1.dp,
             modifier = Modifier.padding(vertical = 10.dp)
         )
 
-        CurrentlyWatching()
+        //CurrentlyWatching()
         HorizontalDivider(
             color = Secondary,
             thickness = 1.dp,
@@ -141,7 +154,33 @@ fun User(pseudo : String) {
 }
 
 @Composable
-fun FavoriteShows() {
+fun FavoriteShows(userId: String?) {
+
+    var favorites by remember { mutableStateOf<List<Map<String, String>>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
+
+    if (userId != null) {
+        val db = FirebaseFirestore.getInstance()
+        val userDoc = db.collection("users").document(userId)
+
+        LaunchedEffect(userId) {
+            userDoc.get().addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val retrievedFavorites = document.get("favorites") as? List<Map<String, String>> ?: emptyList()
+                    favorites = retrievedFavorites
+                } else {
+                    favorites = emptyList()
+                }
+                loading = false
+            }.addOnFailureListener {
+                Log.e("Firestore", "Error fetching favorites: ${it.message}")
+                loading = false
+            }
+        }
+    } else {
+        loading = false
+    }
+
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
         Text(
             text = "Favorite Shows",
@@ -149,43 +188,59 @@ fun FavoriteShows() {
             fontSize = 25.sp
         )
 
-        Row(
+        LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            repeat(4) {
-                BoxSeries(modifier = Modifier.weight(1f))
+            if (loading) {
+                items(4) {
+                    PlaceholderBox()
+                }
+            } else {
+                items(favorites) { favorite ->
+                    BoxSeries(showId = favorite["showId"] ?: "", posterPath = favorite["posterPath"] ?: "")
+                }
             }
         }
     }
 }
 
 @Composable
-fun CurrentlyWatching() {
-    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
-        Text(
-            text = "Currently Watching",
-            color = Primary,
-            fontSize = 25.sp
-        )
-
-        LazyRow(
-            verticalAlignment = Alignment.Top,
-            contentPadding = PaddingValues(vertical = 5.dp),
-            modifier = Modifier.padding(top = 5.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(15) {
-                BoxSeries(modifier = Modifier.width(76.dp))
-            }
-
-        }
-
-
-    }
+fun PlaceholderBox() {
+    Box(
+        modifier = Modifier
+            .height(114.dp)
+            .fillMaxWidth()
+            .background(Secondary)
+    )
 }
+
+
+
+//@Composable
+//fun CurrentlyWatching() {
+//    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
+//        Text(
+//            text = "Currently Watching",
+//            color = Primary,
+//            fontSize = 25.sp
+//        )
+//
+//        LazyRow(
+//            verticalAlignment = Alignment.Top,
+//            contentPadding = PaddingValues(vertical = 5.dp),
+//            modifier = Modifier.padding(top = 5.dp),
+//            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            items(15) {
+//                BoxSeries(modifier = Modifier.width(76.dp))
+//            }
+//
+//        }
+//    }
+//}
 
 
 
@@ -262,17 +317,22 @@ fun Statistics() {
 
 
 @Composable
-fun BoxSeries(modifier: Modifier = Modifier) {
+fun BoxSeries(showId: String, posterPath: String) {
+    val imageUrl = "https://image.tmdb.org/t/p/w500$posterPath"
+
+    val painter = rememberAsyncImagePainter(model = imageUrl)
+
     Box(
-        modifier = modifier
-            .height(114.dp)
-            .background(color = Primary)
-    )
+        modifier = Modifier
+            .height(150.dp)
+            .fillMaxWidth()
+            .background(Secondary)
+    ) {
+
+        Image(
+            painter = painter,
+            contentDescription = "Poster for $showId",
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
-
-
-//@Preview
-//@Composable
-//fun ProfileScreenPreview() {
-//    ProfileScreen(navigator = DestinationsNavigator)
-//}

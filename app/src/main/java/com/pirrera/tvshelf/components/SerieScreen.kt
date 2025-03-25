@@ -173,7 +173,7 @@ fun SerieScreen(
                     onRatingReset = { resetRating() }
                 )
 
-                FavoriteButton(serieId, userId = FirebaseAuth.getInstance().currentUser?.uid ?: "")
+                FavoriteButton(showId = serieId, userId = FirebaseAuth.getInstance().currentUser?.uid ?: "", posterPath = posterPath)
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -342,7 +342,7 @@ fun WatchButton(watchState: WatchState,
 
 
 @Composable
-fun FavoriteButton(showId : String, userId : String) {
+fun FavoriteButton(showId: String, posterPath: String?, userId: String) {
     val db = FirebaseFirestore.getInstance()
     val userDoc = db.collection("users").document(userId)
 
@@ -351,19 +351,22 @@ fun FavoriteButton(showId : String, userId : String) {
     LaunchedEffect(Unit) {
         userDoc.get().addOnSuccessListener { document ->
             if (document.exists()) {
-                val favorites = document.get("favorites") as? List<String> ?: emptyList()
-                favorite = showId in favorites
+                val favorites = document.get("favorites") as? List<HashMap<String, String>> ?: emptyList()
+                favorite = favorites.any { it["showId"] == showId }
             }
         }
     }
 
     IconButton(onClick = {
         favorite = !favorite
+        val favoriteData = hashMapOf("showId" to showId, "posterPath" to posterPath)
+
         if (favorite) {
-            userDoc.update("favorites", FieldValue.arrayUnion(showId)) // ajt aux favoris
+            userDoc.update("favorites", FieldValue.arrayUnion(favoriteData))
         } else {
-            userDoc.update("favorites", FieldValue.arrayRemove(showId)) //retirer des favoris
-        }}) {
+            userDoc.update("favorites", FieldValue.arrayRemove(favoriteData))
+        }
+    }) {
         Icon(
             painter = painterResource(
                 id = if (favorite) R.drawable.filledheart else R.drawable.emptyheart
@@ -372,8 +375,9 @@ fun FavoriteButton(showId : String, userId : String) {
             tint = Red
         )
     }
-
 }
+
+
 
 @Composable
 fun Informations(airDate: String?) {

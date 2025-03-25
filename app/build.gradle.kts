@@ -77,7 +77,7 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation("io.coil-kt.coil3:coil-compose:3.1.0")
+    implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     //implementation(libs.kotlinx.serialization.json)
 
