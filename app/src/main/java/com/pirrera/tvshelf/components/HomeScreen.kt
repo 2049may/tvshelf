@@ -198,6 +198,7 @@ fun HomeScreen(
                         .clickable {
                             navigator.navigate(
                                 SerieScreenDestination(
+                                    serieId = series.id.toString(),
                                     serieName = series.name,
                                     serieOverview = series.overview,
                                     posterPath = series.posterPath,

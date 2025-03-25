@@ -31,7 +31,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +53,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.data.Series
 import com.pirrera.tvshelf.destinations.HomeScreenDestination
@@ -74,6 +80,7 @@ import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 @Composable
 fun SerieScreen(
     navigator: DestinationsNavigator,
+    serieId : String,
     serieName: String,
     serieOverview: String,
     posterPath: String?,
@@ -120,10 +127,12 @@ fun SerieScreen(
                     IconButton(onClick = { navigator.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.back),
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = Primary
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(Background)
             )
 
         }
@@ -164,7 +173,7 @@ fun SerieScreen(
                     onRatingReset = { resetRating() }
                 )
 
-                FavoriteButton()
+                FavoriteButton(serieId, userId = FirebaseAuth.getInstance().currentUser?.uid ?: "")
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -333,10 +342,28 @@ fun WatchButton(watchState: WatchState,
 
 
 @Composable
-fun FavoriteButton() {
+fun FavoriteButton(showId : String, userId : String) {
+    val db = FirebaseFirestore.getInstance()
+    val userDoc = db.collection("users").document(userId)
+
     var favorite by remember { mutableStateOf(false) }
 
-    IconButton(onClick = { favorite = !favorite }) {
+    LaunchedEffect(Unit) {
+        userDoc.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val favorites = document.get("favorites") as? List<String> ?: emptyList()
+                favorite = showId in favorites
+            }
+        }
+    }
+
+    IconButton(onClick = {
+        favorite = !favorite
+        if (favorite) {
+            userDoc.update("favorites", FieldValue.arrayUnion(showId)) // ajt aux favoris
+        } else {
+            userDoc.update("favorites", FieldValue.arrayRemove(showId)) //retirer des favoris
+        }}) {
         Icon(
             painter = painterResource(
                 id = if (favorite) R.drawable.filledheart else R.drawable.emptyheart
