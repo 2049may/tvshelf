@@ -124,6 +124,7 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                                     airDate = series.firstAirDate
                                 )
                             )
+
                         }) {
                         AsyncImage(
                             model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
