@@ -5,6 +5,7 @@ import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +55,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
+import com.pirrera.tvshelf.destinations.SerieScreenDestination
 import com.pirrera.tvshelf.ui.theme.Primary
 import com.pirrera.tvshelf.ui.theme.Red
 import com.pirrera.tvshelf.ui.theme.Secondary
@@ -79,7 +81,7 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
             thickness = 1.dp,
         )
 
-        FavoriteShows(userId)
+        FavoriteShows(userId, navigator)
         HorizontalDivider(
             color = Secondary,
             thickness = 1.dp,
@@ -154,7 +156,7 @@ fun User(pseudo : String) {
 }
 
 @Composable
-fun FavoriteShows(userId: String?) {
+fun FavoriteShows(userId: String?, navigator: DestinationsNavigator) {
 
     var favorites by remember { mutableStateOf<List<Map<String, String>>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -200,7 +202,7 @@ fun FavoriteShows(userId: String?) {
                 }
             } else {
                 items(favorites) { favorite ->
-                    BoxSeries(showId = favorite["showId"] ?: "", posterPath = favorite["posterPath"] ?: "")
+                    BoxSeries(showId = favorite["showId"] ?: "", posterPath = favorite["posterPath"] ?: "", navigator = navigator)
                 }
             }
         }
@@ -317,7 +319,7 @@ fun Statistics() {
 
 
 @Composable
-fun BoxSeries(showId: String, posterPath: String) {
+fun BoxSeries(showId: String, posterPath: String, navigator: DestinationsNavigator) {
     val imageUrl = "https://image.tmdb.org/t/p/w500$posterPath"
 
     val painter = rememberAsyncImagePainter(model = imageUrl)
@@ -332,7 +334,8 @@ fun BoxSeries(showId: String, posterPath: String) {
         Image(
             painter = painter,
             contentDescription = "Poster for $showId",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
         )
     }
 }
