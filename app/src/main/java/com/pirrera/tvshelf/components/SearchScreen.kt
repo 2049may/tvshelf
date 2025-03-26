@@ -119,12 +119,14 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                         .clickable {
                             navigator.navigate(
                                 SerieScreenDestination(
+                                    serieId = series.id.toString(),
                                     serieName = series.name,
                                     serieOverview = series.overview,
                                     posterPath = series.posterPath,
                                     airDate = series.firstAirDate
                                 )
                             )
+
                         }) {
                         AsyncImage(
                             model = "https://image.tmdb.org/t/p/w500/" + series.posterPath,
