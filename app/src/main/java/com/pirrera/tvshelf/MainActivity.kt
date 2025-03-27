@@ -217,7 +217,7 @@ fun BottomAppBarButton(
             contentDescription = iconName,
             modifier = Modifier
                 .height(30.dp)
-                .alpha(if (isSelected) 0.5f else 1f)
+                .alpha(if (isSelected) 1f else 0.5f)
         )
     }
 }
