@@ -23,6 +23,9 @@ interface ApiService {
     @GET("tv?api_key=232c2294d3026daa9a8273d9c624c4d8&sort_by=popularity.desc&with_genres=18&with_watch_providers=8|337|350|119|283|15&watch_region=FR&page=4&append_to_response=episode_groups")
     suspend fun getSeriesByDrama(): SeriesData
 
+    @GET("tv?api_key=232c2294d3026daa9a8273d9c624c4d8&sort_by=popularity.desc&with_genres=10762&with_watch_providers=8|337|350|119|283|15&watch_region=FR&page=2&append_to_response=episode_groups")
+    suspend fun getSeriesByKids(): SeriesData
+
     @GET("tv?api_key=232c2294d3026daa9a8273d9c624c4d8&sort_by=popularity.desc&with_watch_providers=8|337|350|119|283|15&watch_region=FR&page=12&append_to_response=episode_groups")
     suspend fun getSeriesForSearch12(): SeriesData
 

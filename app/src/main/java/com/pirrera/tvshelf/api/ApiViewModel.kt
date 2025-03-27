@@ -110,6 +110,21 @@ class ApiViewModel: ViewModel() {
         }
     }
 
+    private val _seriesKids: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
+    val seriesKids: StateFlow<List<Series>> = _seriesKids.asStateFlow()
+
+    fun fetchSeriesByKids() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getSeriesByKids()
+
+                _seriesKids.value = response.results
+            } catch (e: Exception) {
+                Log.e("Api error", e.localizedMessage ?: "")
+            }
+        }
+    }
+
     private val _seriesSearch: MutableStateFlow<List<Series>> = MutableStateFlow(emptyList())
     val seriesSearch: StateFlow<List<Series>> = _seriesSearch.asStateFlow()
 //
