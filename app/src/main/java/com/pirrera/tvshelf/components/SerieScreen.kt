@@ -97,6 +97,22 @@ fun SerieScreen(
         }
     }
 
+    LaunchedEffect(userId, serieId) {
+        val userDoc = db.collection("users").document(userId)
+        userDoc.collection("showsStatus").document(serieId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val state = document.getString("watchState")
+                    watchState = state?.let { WatchState.valueOf(it) } ?: WatchState.WatchNow
+                }
+            }
+            .addOnFailureListener {
+                Log.e("Firestore", "Error fetching watch state: ${it.message}")
+            }
+    }
+
+
     fun resetRating(db: FirebaseFirestore, userId: String, showId: String, onRatingReset: () -> Unit) {
         val reviewRef = db.collection("reviews")
             .whereEqualTo("userId", userId)
@@ -195,8 +211,12 @@ fun SerieScreen(
                 WatchButton(
                     watchState = watchState,
                     onWatchStateChange = { watchState = it },
-                    onRatingReset = { resetRating(db, userId, serieId) { userRating = null } }
+                    onRatingReset = { resetRating(db, userId, serieId) { userRating = null } },
+                    userId = userId,
+                    serieId = serieId,
+                    posterPath = posterPath
                 )
+
 
 
                 FavoriteButton(showId = serieId, userId = FirebaseAuth.getInstance().currentUser?.uid ?: "", posterPath = posterPath)
@@ -369,10 +389,18 @@ fun fetchUserRating(db: FirebaseFirestore, userId: String, showId: String, onRes
 
 
 @Composable
-fun WatchButton(watchState: WatchState,
-                onWatchStateChange: (WatchState) -> Unit,
-                onRatingReset: () -> Unit
+fun WatchButton(
+    watchState: WatchState,
+    onWatchStateChange: (WatchState) -> Unit,
+    onRatingReset: () -> Unit,
+    userId: String,
+    serieId: String,
+    posterPath: String?
 ) {
+    val db = FirebaseFirestore.getInstance()
+    val userDoc = db.collection("users").document(userId)
+    val serieDoc = userDoc.collection("showsStatus").document(serieId)
+
     OutlinedButton(
         modifier = Modifier
             .width(150.dp)
@@ -387,6 +415,21 @@ fun WatchButton(watchState: WatchState,
 
             if (newState == WatchState.WatchNow) {
                 onRatingReset()
+                //  pas de maj
+                return@OutlinedButton
+            }
+
+            serieDoc.get().addOnSuccessListener { document ->
+                val existingPosterPath = document.getString("posterPath") ?: posterPath
+
+                val updateData = mapOf(
+                    "watchState" to newState.name,
+                    "posterPath" to existingPosterPath
+                )
+
+                serieDoc.set(updateData)
+                    .addOnSuccessListener { Log.d("Firestore", "Watch state updated with posterPath") }
+                    .addOnFailureListener { Log.e("Firestore", "Error updating watch state: ${it.message}") }
             }
         },
         shape = RoundedCornerShape(8.dp),
@@ -419,6 +462,7 @@ fun WatchButton(watchState: WatchState,
         )
     }
 }
+
 
 
 
