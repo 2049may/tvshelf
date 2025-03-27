@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -51,6 +52,7 @@ import com.pirrera.tvshelf.ui.theme.Red
 import com.pirrera.tvshelf.ui.theme.Secondary
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.tasks.await
+import com.pirrera.tvshelf.components.Preloader
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -153,9 +155,9 @@ fun User(pseudo: String) {
 
 @Composable
 fun FavoriteShows(userId: String?, navigator: DestinationsNavigator) {
-
     var favorites by remember { mutableStateOf<List<Map<String, String>>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
+    var numberOfFavorites = favorites.size
 
     if (userId != null) {
         val db = FirebaseFirestore.getInstance()
@@ -167,6 +169,7 @@ fun FavoriteShows(userId: String?, navigator: DestinationsNavigator) {
                     val retrievedFavorites =
                         document.get("favorites") as? List<Map<String, String>> ?: emptyList()
                     favorites = retrievedFavorites
+                    numberOfFavorites = favorites.size
                 } else {
                     favorites = emptyList()
                 }
@@ -187,35 +190,38 @@ fun FavoriteShows(userId: String?, navigator: DestinationsNavigator) {
             fontSize = 25.sp
         )
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (loading) {
-                items(4) {
-                    PlaceholderBox()
-                }
-            } else {
+        if (loading) {
+            ProfilePreloader(numberOfFavorites)
+        } else {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 if (favorites.isEmpty()) {
                     item {
                         Text(
-                            text = "No favorites yet, keep watching !",
+                            text = "No favorites yet, keep watching!",
                             color = Primary,
                             fontSize = 16.sp
                         )
                     }
-
                 } else {
                     items(favorites) { favorite ->
-                        BoxSeries(showId = favorite["showId"] ?: "", posterPath = favorite["posterPath"] ?: "", navigator = navigator)
+                        BoxSeries(
+                            showId = favorite["showId"] ?: "",
+                            posterPath = favorite["posterPath"] ?: "",
+                            navigator = navigator
+                        )
                     }
                 }
             }
         }
     }
 }
+
+
 
 @Composable
 fun PlaceholderBox() {
@@ -418,9 +424,11 @@ fun BoxSeries(showId: String, posterPath: String, navigator: DestinationsNavigat
 
     val painter = rememberAsyncImagePainter(model = imageUrl)
 
+
     Box(
         modifier = Modifier
             .height(150.dp)
+            .width(100.dp)
             .fillMaxWidth()
             .background(Secondary)
     ) {
@@ -433,3 +441,25 @@ fun BoxSeries(showId: String, posterPath: String, navigator: DestinationsNavigat
         )
     }
 }
+
+@Composable
+fun ProfilePreloader(items : Int){
+    LazyRow(
+        verticalAlignment = Alignment.Top,
+        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(items) {
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(150.dp)
+                    .background(color = Secondary)
+            )
+        }
+    }
+}
+
