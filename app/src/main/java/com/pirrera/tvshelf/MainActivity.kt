@@ -1,12 +1,15 @@
 package com.pirrera.tvshelf
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -43,10 +46,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.google.firebase.messaging.FirebaseMessaging
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.components.HomeScreen
 import com.pirrera.tvshelf.components.ProfileScreen
@@ -72,6 +77,20 @@ class MainActivity : ComponentActivity() {
 
         val authViewModel : AuthViewModel by viewModels()
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+
+            // Log and toast
+           // val msg = getString(R.string.msg_token_fmt, token)
+            Log.d(TAG, "BLABLABLA" + token)
+           // Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+        })
 
         setContent {
             TVshelfTheme {
@@ -105,7 +124,7 @@ fun MainScreen(
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
                         message = "No internet connection",
-                        duration = SnackbarDuration.Indefinite
+                        duration = SnackbarDuration.Long
                     )
                 }
             }

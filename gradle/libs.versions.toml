@@ -21,6 +21,8 @@ googleGmsGoogleServices = "4.4.2"
 googleFirebaseCrashlytics = "3.0.3"
 firebaseFirestoreKtx = "25.1.2"
 runtimeLivedata = "1.7.8"
+firebaseMessagingKtx = "24.1.1"
+firebaseMessaging = "24.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -52,6 +54,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlin:kotlinx-serializat
 retrofit = {module = "com.squareup.retrofit2:retrofit",version.ref = "retrofit"}
 converter-gson = {module = "com.squareup.retrofit2:converter-gson",version.ref = "retrofit"}
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,21 +1,18 @@
 package com.pirrera.tvshelf.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,8 +26,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,8 +67,6 @@ import com.pirrera.tvshelf.ui.theme.Tertiary
 import com.pirrera.tvshelf.ui.theme.Yellow
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.result.ResultRecipient
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,18 +80,57 @@ fun SerieScreen(
     posterPath: String?,
     airDate: String?
 ) {
+
+    val db = FirebaseFirestore.getInstance()
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+    var userRating by remember { mutableStateOf<Int?>(null) }
+
+    var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
+
+    val onRatingConfirmed: () -> Unit = {
+        if (watchState == WatchState.WatchNow) watchState = WatchState.Watching
+    }
+
+    LaunchedEffect(userId, serieId) {
+        fetchUserRating(db, userId, serieId) { rating ->
+            userRating = rating
+        }
+    }
+
+    fun resetRating(db: FirebaseFirestore, userId: String, showId: String, onRatingReset: () -> Unit) {
+        val reviewRef = db.collection("reviews")
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("showId", showId)
+
+        reviewRef.get().addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                val docId = documents.documents.first().id
+                db.collection("reviews").document(docId)
+                    .delete() // delete review if exists
+                    .addOnSuccessListener {
+                        Log.d("Firestore", "Review deleted")
+                        onRatingReset() // update ui
+                    }
+                    .addOnFailureListener { Log.e("Firestore", "Error deleting review: ${it.message}") }
+            } else {
+                onRatingReset() // no review to delete but still update ui
+            }
+        }.addOnFailureListener {
+            Log.e("Firestore", "Error fetching review: ${it.message}")
+        }
+    }
+
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
-        //.windowInsetsPadding(WindowInsets.statusBars)
         ,
         topBar = {
             TopAppBar(
                 modifier = Modifier
                     .statusBarsPadding()
                     .fillMaxWidth()
-                //.height(40.dp)
                 ,
                 title = {
                     Row(
@@ -132,7 +166,8 @@ fun SerieScreen(
                 .fillMaxSize()
                 .verticalScroll(
                     rememberScrollState()
-                ),
+                )
+                .background(Background),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AsyncImage(
@@ -144,21 +179,25 @@ fun SerieScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
-            Rating(5) { stars ->
-                if (watchState == WatchState.WatchNow) {
-                    watchState = WatchState.Watching
-                }
-            }
+
+
+            Rating(5, selectedStars = userRating?:0, showId = serieId,
+                onRatingChange = { newRating ->
+                    userRating = newRating
+                },
+                onRatingConfirm = {onRatingConfirmed()})
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                WatchButton(watchState) { newState ->
-                    watchState = newState
-                }
+                WatchButton(
+                    watchState = watchState,
+                    onWatchStateChange = { watchState = it },
+                    onRatingReset = { resetRating(db, userId, serieId) { userRating = null } }
+                )
+
 
                 FavoriteButton(showId = serieId, userId = FirebaseAuth.getInstance().currentUser?.uid ?: "", posterPath = posterPath)
             }
@@ -219,17 +258,26 @@ fun SerieScreen(
 @Composable
 fun Rating(
     maxStars: Int = 5,
-    onRated: (Int) -> Unit // Callback when rating is confirmed
+    selectedStars: Int,
+    showId: String,
+    onRatingChange: (Int) -> Unit,
+    onRatingConfirm: () -> Unit
 ) {
-    var selectedStars by remember { mutableStateOf(0) }
-    var showDialog by remember { mutableStateOf(false) }
-    var tempStars by remember { mutableStateOf(0) }
 
-    Row(horizontalArrangement = Arrangement.spacedBy((-3).dp)) {
+    val db = FirebaseFirestore.getInstance()
+    val userDoc = db.collection("users").document(FirebaseAuth.getInstance().currentUser?.uid ?: "")
+
+    var showDialog by remember { mutableStateOf(false) }
+    var tempRating by remember { mutableStateOf(selectedStars) }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy((-3).dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         for (i in 1..maxStars) {
             IconButton(onClick = {
-                tempStars = i
-                showDialog = true // Show confirmation dialog
+                tempRating = i
+                showDialog = true
             }) {
                 Icon(
                     painter = painterResource(
@@ -246,40 +294,100 @@ fun Rating(
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Confirm Rating") },
-            text = { Text("Are you sure you want to rate this series $tempStars stars?") },
+            text = { Text("Are you sure you want to give this show a rating of $tempRating stars?") },
             confirmButton = {
-                Button(onClick = {
-                    selectedStars = tempStars
+                TextButton(onClick = {
+                    SaveReview(db, userDoc.id, showId = showId, tempRating)
+                    onRatingChange(tempRating)
+                    onRatingConfirm()
                     showDialog = false
-                    onRated(selectedStars) // Notify parent component to update watch state
                 }) {
-                    Text("Confirm")
+                    Text("Yes")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text("Cancel")
+                TextButton(onClick = {
+                    showDialog = false
+                }) {
+                    Text("No")
                 }
             }
         )
     }
 }
 
+fun SaveReview(db: FirebaseFirestore, userId: String, showId: String, rating: Int) {
+    val reviewRef = db.collection("reviews")
+        .whereEqualTo("userId", userId)
+        .whereEqualTo("showId", showId)
+
+    reviewRef.get().addOnSuccessListener { documents ->
+        if (!documents.isEmpty) {  // if review already exists, update
+            val docId = documents.documents.first().id
+            db.collection("reviews").document(docId)
+                .update("rating", rating, "timestamp", FieldValue.serverTimestamp())
+                .addOnSuccessListener { Log.d("Firestore", "Review updated") }
+                .addOnFailureListener { Log.e("Firestore", "Error updating review: ${it.message}") }
+        } else {  // if no review exists, create one
+            val newReview = hashMapOf(
+                "userId" to userId,
+                "showId" to showId,
+                "rating" to rating,
+                //"review" to "", // future maj : review textuelles
+                "timestamp" to FieldValue.serverTimestamp()
+            )
+
+            db.collection("reviews").add(newReview)
+                .addOnSuccessListener { Log.d("Firestore", "Review added") }
+                .addOnFailureListener { Log.e("Firestore", "Error adding review: ${it.message}") }
+        }
+    }.addOnFailureListener {
+        Log.e("Firestore", "Error fetching review: ${it.message}")
+    }
+}
+
+
+fun fetchUserRating(db: FirebaseFirestore, userId: String, showId: String, onResult: (Int?) -> Unit) {
+    db.collection("reviews")
+        .whereEqualTo("userId", userId)
+        .whereEqualTo("showId", showId)
+        .get()
+        .addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                val rating = documents.documents.first().getLong("rating")?.toInt()
+                onResult(rating)
+            } else {
+                onResult(null) // Pas encore de note
+            }
+        }
+        .addOnFailureListener {
+            Log.e("Firestore", "Error fetching rating", it)
+            onResult(null)
+        }
+}
+
+
 
 @Composable
-fun WatchButton(watchState: WatchState, onWatchStateChange: (WatchState) -> Unit) {
+fun WatchButton(watchState: WatchState,
+                onWatchStateChange: (WatchState) -> Unit,
+                onRatingReset: () -> Unit
+) {
     OutlinedButton(
         modifier = Modifier
             .width(150.dp)
             .padding(5.dp),
         onClick = {
-            onWatchStateChange(
-                when (watchState) {
-                    WatchState.WatchNow -> WatchState.Watching
-                    WatchState.Watching -> WatchState.Watched
-                    WatchState.Watched -> WatchState.WatchNow
-                }
-            )
+            val newState = when (watchState) {
+                WatchState.WatchNow -> WatchState.Watching
+                WatchState.Watching -> WatchState.Watched
+                WatchState.Watched -> WatchState.WatchNow
+            }
+            onWatchStateChange(newState)
+
+            if (newState == WatchState.WatchNow) {
+                onRatingReset()
+            }
         },
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
