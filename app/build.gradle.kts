@@ -68,6 +68,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
+    implementation("io.coil-kt:coil-compose:2.2.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     // Import the BoM for the Firebase platform
     implementation(platform(libs.firebase.bom))
@@ -78,6 +79,7 @@ dependencies {
 
     implementation("com.google.firebase:firebase-bom:32.0.0")
     implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.coil.compose)
