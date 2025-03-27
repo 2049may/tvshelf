@@ -133,39 +133,53 @@ fun ProfileScreen(navigator: DestinationsNavigator,authViewModel: AuthViewModel 
 }
 
 @Composable
-fun User(pseudo : String) {
+fun User(pseudo: String) {
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     var uploadedImageUrl by remember { mutableStateOf<String?>(null) }
+    val userId = Firebase.auth.currentUser?.uid
+    val db = FirebaseFirestore.getInstance()
+
+    // recup la pp
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            db.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    val profilePicUrl = document.getString("profilePic")
+                    uploadedImageUrl = profilePicUrl
+                }
+        }
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
+        imageUri = uri
         uploadImageToFirebase(uri, context) { downloadUrl ->
+            uploadedImageUrl = downloadUrl
             Log.d("ImageUpload", "Image uploadée avec succès : $downloadUrl")
         }
     }
-
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 15.dp),
-        horizontalArrangement = Arrangement.Absolute.Left,
+        horizontalArrangement = Arrangement.Start
     ) {
         Image(
-            painter = if (imageUri != null) {
-                rememberAsyncImagePainter(imageUri)
-            } else {
-                painterResource(R.drawable.default_pfp)
+            painter = when {
+                imageUri != null -> rememberAsyncImagePainter(imageUri)
+                uploadedImageUrl != null -> rememberAsyncImagePainter(uploadedImageUrl)
+                else -> painterResource(R.drawable.default_pfp)
             },
             contentDescription = "User profile picture",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .clip(CircleShape)
                 .size(70.dp)
-                .clickable {   imagePickerLauncher.launch("image/*") }
+                .clickable { imagePickerLauncher.launch("image/*") }
         )
 
         Column(
@@ -185,9 +199,9 @@ fun User(pseudo : String) {
                 fontSize = 16.sp
             )
         }
-
     }
 }
+
 
 fun getFileFromUri(context: Context, uri: Uri): File? {
     val contentResolver = context.contentResolver
@@ -213,6 +227,10 @@ fun uploadImageToFirebase(uri: Uri?, context: Context, onSuccess: (String) -> Un
 
     if (userId != null) {
         db.collection("users").document(userId).update("profilePic", uri.toString())
+            .addOnSuccessListener {
+                Toast.makeText(context, "Image de profil mise à jour !", Toast.LENGTH_SHORT).show()
+            }
+
     }
 
     val storageRef = Firebase.storage("gs://tvshelf2049.firebasestorage.app")
