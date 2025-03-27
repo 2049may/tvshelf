@@ -123,6 +123,7 @@ fun SearchScreen(navigator: DestinationsNavigator,viewModel: ApiViewModel = view
                                     serieName = series.name,
                                     serieOverview = series.overview,
                                     posterPath = series.posterPath,
+                                    voteAvg = series.voteAverage.toString(),
                                     airDate = series.firstAirDate
                                 )
                             )

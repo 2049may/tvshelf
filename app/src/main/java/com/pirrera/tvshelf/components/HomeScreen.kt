@@ -62,6 +62,7 @@ fun HomeScreen(
     val crimeList by viewModel.seriesCrime.collectAsState()
     val comedyList by viewModel.seriesComedy.collectAsState()
     val dramaList by viewModel.seriesDrama.collectAsState()
+    val kidList by viewModel.seriesKids.collectAsState()
     val context = LocalContext.current
     val authState = authViewModel.authState.observeAsState()
     var imageState by remember { mutableStateOf("loading") }
@@ -82,6 +83,7 @@ fun HomeScreen(
         viewModel.fetchSeriesByCrime()
         viewModel.fetchSeriesByComedy()
         viewModel.fetchSeriesByDrama()
+        viewModel.fetchSeriesByKids()
     }
 
     Column(
@@ -155,8 +157,22 @@ fun HomeScreen(
                 }
             }
         }
+
+        Box(modifier = Modifier.padding(top = 10.dp)) {
+            Text("Kids", color = Primary, fontSize = 22.sp)
+            when {
+                isActionLoading -> {
+                    Preloader()
+                }
+
+                else -> {
+                    ListeSerie(kidList, navigator)
+                }
+            }
         }
-    }
+        }
+}
+
 
     @Composable
     fun BoxSeries() {
@@ -202,6 +218,7 @@ fun HomeScreen(
                                     serieName = series.name,
                                     serieOverview = series.overview,
                                     posterPath = series.posterPath,
+                                    voteAvg = series.voteAverage.toString(),
                                     airDate = series.firstAirDate
                                 )
                             )

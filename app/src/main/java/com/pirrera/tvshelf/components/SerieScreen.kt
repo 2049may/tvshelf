@@ -78,6 +78,7 @@ fun SerieScreen(
     serieName: String,
     serieOverview: String,
     posterPath: String?,
+    voteAvg: String,
     airDate: String?
 ) {
 
@@ -86,7 +87,6 @@ fun SerieScreen(
     var userRating by remember { mutableStateOf<Int?>(null) }
 
     var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
-
     val onRatingConfirmed: () -> Unit = {
         if (watchState == WatchState.WatchNow) {
             watchState = WatchState.Watching
@@ -258,7 +258,7 @@ fun SerieScreen(
                 modifier = Modifier.padding(horizontal = 30.dp)
             )
 
-            Informations(airDate)
+            Informations(airDate, voteAverage = voteAvg)
 
             HorizontalDivider(
                 color = Secondary,
@@ -624,7 +624,7 @@ fun FavoriteButton(showId: String, posterPath: String?, userId: String) {
 
 
 @Composable
-fun Informations(airDate: String?) {
+fun Informations(airDate: String?, voteAverage : String) {
     Column(modifier = Modifier.padding(vertical = 5.dp)) {
 
 
@@ -635,7 +635,7 @@ fun Informations(airDate: String?) {
         ) {
 
             Text(
-                text = "X seasons", //TODO : recuperer le nombre de saisons
+                text = "AIR DATE",
                 fontSize = 16.sp,
                 color = Primary,
                 textAlign = TextAlign.Left,
@@ -646,7 +646,6 @@ fun Informations(airDate: String?) {
                 Text(
                     text = airDate.trim().substring(0, 4),
                     fontSize = 16.sp,
-                    color = Primary,
                     textAlign = TextAlign.Right,
                 )
             }
@@ -659,15 +658,15 @@ fun Informations(airDate: String?) {
         ) {
 
             Text(
-                text = "DIRECTED BY",
-                fontSize = 14.sp,
+                text = "RATING",
+                fontSize = 16.sp,
                 color = Primary,
                 textAlign = TextAlign.Left,
                 modifier = Modifier.weight(1f)
             )
 
             Text(
-                text = "dddd", // TODO : recuperer le réal
+                text = voteAverage + " out of 10",
                 textAlign = TextAlign.Right,
                 modifier = Modifier.weight(1f)
 

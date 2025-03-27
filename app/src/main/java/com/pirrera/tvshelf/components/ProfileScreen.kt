@@ -1,9 +1,18 @@
 package com.pirrera.tvshelf.components
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +25,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,15 +46,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.storage
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storage
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.auth.AuthViewModel
 import com.pirrera.tvshelf.destinations.LoginScreenDestination
@@ -51,6 +73,8 @@ import com.pirrera.tvshelf.ui.theme.Primary
 import com.pirrera.tvshelf.ui.theme.Red
 import com.pirrera.tvshelf.ui.theme.Secondary
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import java.io.File
 import kotlinx.coroutines.tasks.await
 import com.pirrera.tvshelf.components.Preloader
 import kotlinx.coroutines.delay
@@ -119,18 +143,52 @@ fun ProfileScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel
 
 @Composable
 fun User(pseudo: String) {
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    var uploadedImageUrl by remember { mutableStateOf<String?>(null) }
+    val userId = Firebase.auth.currentUser?.uid
+    val db = FirebaseFirestore.getInstance()
+
+    // recup la pp
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            db.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    val profilePicUrl = document.getString("profilePic")
+                    uploadedImageUrl = profilePicUrl
+                }
+        }
+    }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+        uploadImageToFirebase(uri, context) { downloadUrl ->
+            uploadedImageUrl = downloadUrl
+            Log.d("ImageUpload", "Image uploadée avec succès : $downloadUrl")
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 15.dp),
-        horizontalArrangement = Arrangement.Absolute.Left,
+        horizontalArrangement = Arrangement.Start
     ) {
         Image(
-            painter = painterResource(R.drawable.default_pfp),
+            painter = when {
+                imageUri != null -> rememberAsyncImagePainter(imageUri)
+                uploadedImageUrl != null -> rememberAsyncImagePainter(uploadedImageUrl)
+                else -> painterResource(R.drawable.default_pfp)
+            },
             contentDescription = "User profile picture",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .clip(CircleShape)
                 .size(70.dp)
+                .clickable { imagePickerLauncher.launch("image/*") }
         )
 
         Column(
@@ -150,7 +208,61 @@ fun User(pseudo: String) {
                 fontSize = 16.sp
             )
         }
+    }
+}
 
+
+fun getFileFromUri(context: Context, uri: Uri): File? {
+    val contentResolver = context.contentResolver
+    val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
+    tempFile.outputStream().use { output ->
+        contentResolver.openInputStream(uri)?.use { input ->
+            input.copyTo(output)
+        }
+    }
+    return tempFile
+}
+
+fun uploadImageToFirebase(uri: Uri?, context: Context, onSuccess: (String) -> Unit) {
+
+    val db = FirebaseFirestore.getInstance()
+    val userId = Firebase.auth.currentUser?.uid
+
+
+    if (uri == null) {
+        Toast.makeText(context, "Aucune image sélectionnée !", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    if (userId != null) {
+        db.collection("users").document(userId).update("profilePic", uri.toString())
+            .addOnSuccessListener {
+                Toast.makeText(context, "Image de profil mise à jour !", Toast.LENGTH_SHORT).show()
+            }
+
+    }
+
+    val storageRef = Firebase.storage("gs://tvshelf2049.firebasestorage.app")
+        .getReference("profile_pictures")
+    val fileName = "profile_pictures/${userId}.jpg"
+    val imageRef = storageRef.child(fileName)
+
+    val file = getFileFromUri(context, uri)
+    if (file != null) {
+        val fileUri = Uri.fromFile(file)
+
+        imageRef.putFile(fileUri)
+            .addOnSuccessListener {
+                imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                    onSuccess(downloadUri.toString())
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("FirebaseUpload", "Erreur lors de l'upload", exception)
+                Toast.makeText(context, "Échec de l'upload : ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    } else {
+        Toast.makeText(context, "Impossible de traiter l'image", Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -221,7 +333,6 @@ fun FavoriteShows(userId: String?, navigator: DestinationsNavigator) {
         }
     }
 }
-
 
 @Composable
 fun PlaceholderBox() {
@@ -420,12 +531,12 @@ fun Statistics(userId: String?) {
 }
 
 
+
 @Composable
 fun BoxSeries(showId: String, posterPath: String, navigator: DestinationsNavigator) {
     val imageUrl = "https://image.tmdb.org/t/p/w500$posterPath"
 
     val painter = rememberAsyncImagePainter(model = imageUrl)
-
 
     Box(
         modifier = Modifier
