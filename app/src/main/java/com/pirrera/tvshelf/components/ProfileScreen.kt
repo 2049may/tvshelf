@@ -50,6 +50,7 @@ import com.pirrera.tvshelf.ui.theme.Primary
 import com.pirrera.tvshelf.ui.theme.Red
 import com.pirrera.tvshelf.ui.theme.Secondary
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.tasks.await
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -87,7 +88,7 @@ fun ProfileScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel
             modifier = Modifier.padding(vertical = 10.dp)
         )
 
-        Statistics()
+        Statistics(userId)
         HorizontalDivider(
             color = Secondary,
             thickness = 1.dp
@@ -281,7 +282,7 @@ fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
                 if (currentlyWatching.isEmpty()) {
                     item {
                         Text(
-                            text = "It's empty here... Start a new show !",
+                            text = "Nothing here... Start a new show !",
                             color = Primary,
                             fontSize = 16.sp
                         )
@@ -301,7 +302,43 @@ fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
 }
 
 @Composable
-fun Statistics() {
+fun Statistics(userId: String?) {
+
+    var finishedShows by remember { mutableStateOf(0) }
+    var currentlyWatching by remember { mutableStateOf(0) }
+    var averageRating by remember { mutableStateOf(0.0) }
+
+    if (userId != null) {
+        val db = FirebaseFirestore.getInstance()
+        val userShowsStatusCollection = db.collection("users").document(userId).collection("showsStatus")
+
+        LaunchedEffect(userId) {
+            userShowsStatusCollection.get()
+                .addOnSuccessListener { querySnapshot ->
+                    val documents = querySnapshot.documents
+
+                    finishedShows = documents.count { it.getString("watchState") == "Watched" }
+                    currentlyWatching = documents.count { it.getString("watchState") == "Watching" }
+                }
+                .addOnFailureListener {
+                    finishedShows = 0
+                    currentlyWatching = 0
+                    Log.e("Firestore", "Error fetching shows: ${it.message}")
+                }
+        }
+
+        LaunchedEffect(userId) {
+            val userSnapshot = db.collection("users").document(userId).get().await()
+            averageRating = userSnapshot.getDouble("averageRating") ?: 0.0
+        }
+
+
+
+
+    }
+
+
+
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 15.dp),
@@ -310,7 +347,7 @@ fun Statistics() {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Episodes this month",
+                text = "Average Rating",
                 color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Start,
@@ -319,7 +356,7 @@ fun Statistics() {
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = "51",
+                text = averageRating.toString(),
                 color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
@@ -339,7 +376,7 @@ fun Statistics() {
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = "5 shows",
+                text = currentlyWatching.toString(),
                 color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
@@ -359,7 +396,7 @@ fun Statistics() {
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = "13",
+                text = finishedShows.toString(),
                 color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,
@@ -370,6 +407,8 @@ fun Statistics() {
 
     }
 }
+
+
 
 
 @Composable

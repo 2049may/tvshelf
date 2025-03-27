@@ -561,6 +561,8 @@ fun Informations(airDate: String?) {
     }
 }
 
+
+
 //@Preview
 //@Composable
 //fun RatingPreview() {
