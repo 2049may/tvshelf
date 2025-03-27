@@ -53,6 +53,7 @@ import com.pirrera.tvshelf.ui.theme.Secondary
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.tasks.await
 import com.pirrera.tvshelf.components.Preloader
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -222,7 +223,6 @@ fun FavoriteShows(userId: String?, navigator: DestinationsNavigator) {
 }
 
 
-
 @Composable
 fun PlaceholderBox() {
     Box(
@@ -237,10 +237,12 @@ fun PlaceholderBox() {
 fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
     var currentlyWatching by remember { mutableStateOf<List<Map<String, String>>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
+    var numberOfCurrentlyWatching = currentlyWatching.size
 
     if (userId != null) {
         val db = FirebaseFirestore.getInstance()
-        val userShowsStatusCollection = db.collection("users").document(userId).collection("showsStatus")
+        val userShowsStatusCollection =
+            db.collection("users").document(userId).collection("showsStatus")
 
         LaunchedEffect(userId) {
             userShowsStatusCollection
@@ -257,6 +259,7 @@ fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
                         }
                     }
                     currentlyWatching = shows
+                    numberOfCurrentlyWatching = currentlyWatching.size
                     loading = false
                 }
                 .addOnFailureListener {
@@ -274,17 +277,17 @@ fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
             fontSize = 25.sp
         )
 
-        LazyRow(
-            verticalAlignment = Alignment.Top,
-            contentPadding = PaddingValues(vertical = 5.dp),
-            modifier = Modifier.padding(top = 5.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            if (loading) {
-                items(4) {
-                    PlaceholderBox()
-                }
-            } else {
+        if (loading) {
+            ProfilePreloader(numberOfCurrentlyWatching)
+        } else {
+
+            LazyRow(
+                verticalAlignment = Alignment.Top,
+                contentPadding = PaddingValues(vertical = 5.dp),
+                modifier = Modifier.padding(top = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
                 if (currentlyWatching.isEmpty()) {
                     item {
                         Text(
@@ -304,8 +307,10 @@ fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
                 }
             }
         }
+
     }
 }
+
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -317,7 +322,8 @@ fun Statistics(userId: String?) {
 
     if (userId != null) {
         val db = FirebaseFirestore.getInstance()
-        val userShowsStatusCollection = db.collection("users").document(userId).collection("showsStatus")
+        val userShowsStatusCollection =
+            db.collection("users").document(userId).collection("showsStatus")
 
         LaunchedEffect(userId) {
             userShowsStatusCollection.get()
@@ -338,8 +344,6 @@ fun Statistics(userId: String?) {
             val userSnapshot = db.collection("users").document(userId).get().await()
             averageRating = userSnapshot.getDouble("averageRating") ?: 0.0
         }
-
-
 
 
     }
@@ -416,8 +420,6 @@ fun Statistics(userId: String?) {
 }
 
 
-
-
 @Composable
 fun BoxSeries(showId: String, posterPath: String, navigator: DestinationsNavigator) {
     val imageUrl = "https://image.tmdb.org/t/p/w500$posterPath"
@@ -443,7 +445,7 @@ fun BoxSeries(showId: String, posterPath: String, navigator: DestinationsNavigat
 }
 
 @Composable
-fun ProfilePreloader(items : Int){
+fun ProfilePreloader(items: Int) {
     LazyRow(
         verticalAlignment = Alignment.Top,
         contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
