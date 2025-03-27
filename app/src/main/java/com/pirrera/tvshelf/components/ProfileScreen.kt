@@ -201,14 +201,23 @@ fun getFileFromUri(context: Context, uri: Uri): File? {
 }
 
 fun uploadImageToFirebase(uri: Uri?, context: Context, onSuccess: (String) -> Unit) {
+
+    val db = FirebaseFirestore.getInstance()
+    val userId = Firebase.auth.currentUser?.uid
+
+
     if (uri == null) {
         Toast.makeText(context, "Aucune image sélectionnée !", Toast.LENGTH_SHORT).show()
         return
     }
 
-    val storageRef = Firebase.storage("gs://talkify-bd23c.appspot.com/")
-        .getReference(senderRoom.plus("/Media/Picture/".plus(uri)))
-    val fileName = "profile_pictures/${System.currentTimeMillis()}.jpg"
+    if (userId != null) {
+        db.collection("users").document(userId).update("profilePic", uri.toString())
+    }
+
+    val storageRef = Firebase.storage("gs://tvshelf2049.firebasestorage.app")
+        .getReference("profile_pictures")
+    val fileName = "profile_pictures/${userId}.jpg"
     val imageRef = storageRef.child(fileName)
 
     val file = getFileFromUri(context, uri)
