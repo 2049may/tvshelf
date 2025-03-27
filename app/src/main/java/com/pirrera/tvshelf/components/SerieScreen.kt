@@ -415,7 +415,9 @@ fun WatchButton(
 
             if (newState == WatchState.WatchNow) {
                 onRatingReset()
-                //  pas de maj
+                serieDoc.delete() // supprime le document si etat = watch now
+                    .addOnSuccessListener { Log.d("Firestore", "Show removed from watchlist") }
+                    .addOnFailureListener { Log.e("Firestore", "Error removing show: ${it.message}") }
                 return@OutlinedButton
             }
 
@@ -462,6 +464,7 @@ fun WatchButton(
         )
     }
 }
+
 
 
 
