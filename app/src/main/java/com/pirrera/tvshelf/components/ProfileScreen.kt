@@ -301,6 +301,7 @@ fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun Statistics(userId: String?) {
 
@@ -356,7 +357,7 @@ fun Statistics(userId: String?) {
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = averageRating.toString(),
+                text = String.format("%.2f", averageRating),
                 color = Primary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.End,

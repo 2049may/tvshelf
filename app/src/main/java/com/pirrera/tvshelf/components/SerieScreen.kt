@@ -88,8 +88,24 @@ fun SerieScreen(
     var watchState by rememberSaveable { mutableStateOf(WatchState.WatchNow) }
 
     val onRatingConfirmed: () -> Unit = {
-        if (watchState == WatchState.WatchNow) watchState = WatchState.Watching
+        if (watchState == WatchState.WatchNow) {
+            watchState = WatchState.Watching
+
+            // update firestore
+            val db = FirebaseFirestore.getInstance()
+            val userDoc = db.collection("users").document(userId)
+            val serieDoc = userDoc.collection("showsStatus").document(serieId)
+            val updateData = mapOf(
+                "watchState" to watchState.name,  // wathing
+                "posterPath" to (posterPath ?: "")
+            )
+
+            serieDoc.set(updateData)
+                .addOnSuccessListener { Log.d("Firestore", "Watch state saved successfully") }
+                .addOnFailureListener { e -> Log.e("Firestore", "Error saving watch state: ${e.message}") }
+        }
     }
+
 
     LaunchedEffect(userId, serieId) {
         fetchUserRating(db, userId, serieId) { rating ->
@@ -124,6 +140,7 @@ fun SerieScreen(
                 db.collection("reviews").document(docId)
                     .delete() // delete review if exists
                     .addOnSuccessListener {
+                        deleteRatingAndUpdateAverage(db, userId, userRating ?: 0)
                         Log.d("Firestore", "Review deleted")
                         onRatingReset() // update ui
                     }
@@ -342,28 +359,127 @@ fun SaveReview(db: FirebaseFirestore, userId: String, showId: String, rating: In
         .whereEqualTo("showId", showId)
 
     reviewRef.get().addOnSuccessListener { documents ->
-        if (!documents.isEmpty) {  // if review already exists, update
-            val docId = documents.documents.first().id
+        if (!documents.isEmpty) {
+            // if review exists -> update
+            val doc = documents.documents.first()
+            val oldRating = doc.getLong("rating")?.toInt()
+            val docId = doc.id
             db.collection("reviews").document(docId)
                 .update("rating", rating, "timestamp", FieldValue.serverTimestamp())
-                .addOnSuccessListener { Log.d("Firestore", "Review updated") }
-                .addOnFailureListener { Log.e("Firestore", "Error updating review: ${it.message}") }
-        } else {  // if no review exists, create one
+                .addOnSuccessListener {
+                    Log.d("Firestore", "Review updated")
+                    updateUserAverageRating(db, userId, rating, oldRating)
+                }
+                .addOnFailureListener {
+                    Log.e("Firestore", "Error updating review: ${it.message}")
+                }
+        } else {
+            // new review
             val newReview = hashMapOf(
                 "userId" to userId,
                 "showId" to showId,
                 "rating" to rating,
-                //"review" to "", // future maj : review textuelles
                 "timestamp" to FieldValue.serverTimestamp()
             )
 
             db.collection("reviews").add(newReview)
-                .addOnSuccessListener { Log.d("Firestore", "Review added") }
-                .addOnFailureListener { Log.e("Firestore", "Error adding review: ${it.message}") }
+                .addOnSuccessListener {
+                    Log.d("Firestore", "Review added")
+                    // old rating is null because it's a new review
+                    updateUserAverageRating(db, userId, rating, null)
+                }
+                .addOnFailureListener {
+                    Log.e("Firestore", "Error adding review: ${it.message}")
+                }
         }
     }.addOnFailureListener {
         Log.e("Firestore", "Error fetching review: ${it.message}")
     }
+}
+
+
+fun updateUserAverageRating(
+    db: FirebaseFirestore,
+    userId: String,
+    newRating: Int,
+    oldRating: Int?
+) {
+    val userDoc = db.collection("users").document(userId)
+
+    db.runTransaction { transaction ->
+        val snapshot = transaction.get(userDoc)
+        // 0 if no ratings yet
+        val totalRating = snapshot.getLong("totalRating") ?: 0L
+        val ratingCount = snapshot.getLong("ratingCount") ?: 0L
+
+        // if rating already exists, substract old rating and add new rating
+        // otherwise, just add new rating and increment count
+        val newTotalRating: Long
+        val newRatingCount: Long
+
+        if (oldRating != null) {
+            newTotalRating = totalRating - oldRating + newRating
+            newRatingCount = ratingCount // no increment on update
+        } else {
+            newTotalRating = totalRating + newRating
+            newRatingCount = ratingCount + 1
+        }
+
+        // calculate new avg
+        val newAverage = if (newRatingCount > 0) newTotalRating.toDouble() / newRatingCount else 0.0
+
+        // update user document
+        transaction.update(userDoc, mapOf(
+            "totalRating" to newTotalRating,
+            "ratingCount" to newRatingCount,
+            "averageRating" to newAverage
+        ))
+    }.addOnSuccessListener {
+        Log.d("Firestore", "User average rating updated successfully.")
+    }.addOnFailureListener {
+        Log.e("Firestore", "Error updating user average rating: ${it.message}")
+    }
+}
+
+
+fun deleteRatingAndUpdateAverage(
+    db: FirebaseFirestore,
+    userId: String,
+    rating: Int  // the rating value that is being deleted
+) {
+    val userDoc = db.collection("users").document(userId)
+
+    db.runTransaction { transaction ->
+        val snapshot = transaction.get(userDoc)
+        val totalRating = snapshot.getLong("totalRating") ?: 0L
+        val ratingCount = snapshot.getLong("ratingCount") ?: 0L
+
+        // if no ratings, all values = 0
+        if (ratingCount <= 0) {
+            transaction.update(userDoc, mapOf(
+                "totalRating" to 0L,
+                "ratingCount" to 0L,
+                "averageRating" to 0.0
+            ))
+            return@runTransaction
+        }
+
+        val newTotalRating = totalRating - rating
+        val newRatingCount = ratingCount - 1
+        val newAverage = if (newRatingCount > 0) newTotalRating.toDouble() / newRatingCount else 0.0
+
+        transaction.update(userDoc, mapOf(
+            "totalRating" to newTotalRating,
+            "ratingCount" to newRatingCount,
+            "averageRating" to newAverage
+        ))
+    }
+        .addOnSuccessListener {
+            Log.d("Firestore", "User average updated successfully after deletion.")
+        }
+        .addOnFailureListener { e ->
+            Log.e("Firestore", "Error updating average after deletion: ${e.message}")
+        }
 }
 
 
@@ -561,15 +677,6 @@ fun Informations(airDate: String?) {
     }
 }
 
-
-
-//@Preview
-//@Composable
-//fun RatingPreview() {
-//
-//    Rating()
-//
-//}
 
 
 @Preview(showBackground = true)
