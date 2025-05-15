@@ -47,8 +47,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.BuildConfig
+import com.pirrera.tvshelf.BuildConfig
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.messaging.FirebaseMessaging
@@ -70,6 +72,19 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        val options = FirebaseOptions.Builder()
+            .setApplicationId(BuildConfig.FIREBASE_APP_ID)
+            .setApiKey(BuildConfig.FIREBASE_API_KEY)
+            .setProjectId(BuildConfig.FIREBASE_PROJECT_ID)
+            .setDatabaseUrl(BuildConfig.FIREBASE_DATABASE_URL)
+            .setStorageBucket(BuildConfig.FIREBASE_STORAGE_BUCKET)
+            .build()
+
+        if (FirebaseApp.getApps(this).isEmpty()) {
+            FirebaseApp.initializeApp(this, options)
+        }
 
         FirebaseEmulatorConfig.configureFireBaseServices()
 
