@@ -1,3 +1,8 @@
+import java.util.Properties
+
+
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -14,6 +19,15 @@ android {
     namespace = "com.pirrera.tvshelf"
     compileSdk = 35
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(localPropertiesFile.inputStream())
+    }
     defaultConfig {
         applicationId = "com.pirrera.tvshelf"
         minSdk = 28
@@ -22,6 +36,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "FIREBASE_API_KEY", "\"${localProperties["FIREBASE_API_KEY"]}\"")
+        buildConfigField("String", "FIREBASE_APP_ID", "\"${localProperties["FIREBASE_APP_ID"]}\"")
+        buildConfigField("String", "FIREBASE_PROJECT_ID", "\"${localProperties["FIREBASE_PROJECT_ID"]}\"")
+        buildConfigField("String", "FIREBASE_DATABASE_URL", "\"${localProperties["FIREBASE_DATABASE_URL"]}\"")
+        buildConfigField("String", "FIREBASE_STORAGE_BUCKET", "\"${localProperties["FIREBASE_STORAGE_BUCKET"]}\"")
+        buildConfigField("String", "TVSHELF_API_KEY", "\"${localProperties["TVSHELF_API_KEY"]}\"")
     }
 
     buildTypes {
