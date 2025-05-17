@@ -1,6 +1,5 @@
 package com.pirrera.tvshelf.data
 
-import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 
 data class SeriesData(

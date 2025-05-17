@@ -1,8 +1,5 @@
 package com.pirrera.tvshelf.components
 
-import android.annotation.SuppressLint
-import android.view.KeyEvent
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
@@ -44,7 +40,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.pirrera.tvshelf.R
 import com.pirrera.tvshelf.api.ApiViewModel
-import com.pirrera.tvshelf.destinations.Destination
 import com.pirrera.tvshelf.destinations.SerieScreenDestination
 import com.pirrera.tvshelf.ui.theme.Primary
 import com.pirrera.tvshelf.ui.theme.Secondary

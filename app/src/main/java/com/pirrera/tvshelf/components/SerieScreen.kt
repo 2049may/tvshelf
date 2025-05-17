@@ -17,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -44,19 +43,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pirrera.tvshelf.R
-import com.pirrera.tvshelf.data.Series
-import com.pirrera.tvshelf.destinations.HomeScreenDestination
-import com.pirrera.tvshelf.destinations.MainScreenDestination
-import com.pirrera.tvshelf.destinations.SerieScreenDestination
 import com.pirrera.tvshelf.model.WatchState
 import com.pirrera.tvshelf.ui.theme.Background
 import com.pirrera.tvshelf.ui.theme.Green
@@ -674,12 +667,4 @@ fun Informations(airDate: String?, voteAverage : String) {
 
         }
     }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun WatchButtonPreview() {
-
 }
