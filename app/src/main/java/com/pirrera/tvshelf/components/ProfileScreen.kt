@@ -115,6 +115,18 @@ fun ProfileScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel
             modifier = Modifier.padding(vertical = 10.dp)
         )
 
+
+        FinishedShows(
+            userId = userId,
+            navigator = navigator
+        )
+        HorizontalDivider(
+            color = Secondary,
+            thickness = 1.dp,
+            modifier = Modifier.padding(vertical = 10.dp)
+        )
+
+
         Statistics(userId)
         HorizontalDivider(
             color = Secondary,
@@ -161,7 +173,9 @@ fun User(pseudo: String) {
         }
     }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
+
+
+val imagePickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imageUri = uri
@@ -421,6 +435,87 @@ fun CurrentlyWatching(userId: String?, navigator: DestinationsNavigator) {
 
     }
 }
+
+@Composable
+fun FinishedShows(userId: String?, navigator: DestinationsNavigator) {
+    var finished by remember { mutableStateOf<List<Map<String, String>>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
+    var numberOfFinished = finished.size
+
+    if (userId != null) {
+        val db = FirebaseFirestore.getInstance()
+        val userDoc = db.collection("users").document(userId)
+
+        if (userId != null) {
+            val userShowsStatusCollection =
+                db.collection("users").document(userId).collection("showsStatus")
+
+            LaunchedEffect(userId) {
+                userShowsStatusCollection
+                    .whereEqualTo("watchState", "Watched")
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        val watchedShows = querySnapshot.documents.mapNotNull { document ->
+                            val posterPath = document.getString("posterPath")
+                            val showId = document.id
+                            if (posterPath != null) {
+                                mapOf("showId" to showId, "posterPath" to posterPath)
+                            } else null
+                        }
+                        finished = watchedShows
+                        numberOfFinished = finished.size
+                        loading = false
+                    }
+                    .addOnFailureListener {
+                        Log.e("Firestore", "Error fetching watched shows: ${it.message}")
+                        loading = false
+                    }
+            }
+        } else {
+            loading = false
+        }
+    }
+
+    Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 15.dp)) {
+        Text(
+            text = "Finished Shows",
+            color = Primary,
+            fontSize = 25.sp
+        )
+
+        if (loading) {
+            ProfilePreloader(numberOfFinished)
+        } else {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (finished.isEmpty()) {
+                    item {
+                        Text(
+                            text = "No favorites yet, keep watching!",
+                            color = Primary,
+                            fontSize = 16.sp
+                        )
+                    }
+                } else {
+                    items(finished) { finished ->
+                        BoxSeries(
+                            showId = finished["showId"] ?: "",
+                            posterPath = finished["posterPath"] ?: "",
+                            navigator = navigator
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
 
 
 @SuppressLint("DefaultLocale")
