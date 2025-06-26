@@ -1,5 +1,7 @@
 package com.pirrera.tvshelf.auth
 
+import android.widget.Toast
+import androidx.collection.emptyLongSet
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -45,39 +47,52 @@ class AuthViewModel : ViewModel() {
             }
     }
 
-    fun signup(pseudo : String, email: String, password: String) {
+    fun signup(username : String, pseudo : String, email: String, password: String) {
 
-        if (email.isBlank() || password.isBlank() || pseudo.isBlank()) {
+        if (username.isBlank() || email.isBlank() || password.isBlank() || pseudo.isBlank()) {
             _authState.value = AuthState.Error("Pseudo, email and password cannot be empty")
             return
         }
 
-        _authState.value = AuthState.Loading
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    user?.let{
-                        it.updateProfile(userProfileChangeRequest {
-                            displayName = pseudo
-                        }).addOnCompleteListener{profileTask ->
-                            if(profileTask.isSuccessful){
-                                saveUserToFirestore(it.uid, pseudo, email)
+        //Verification doublon de username
+        db.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { result ->
+                if (!result.isEmpty) {
+                    _authState.value = AuthState.Error("Ce nom d'utilisateur est déjà pris")
+                    return@addOnSuccessListener
+                }
+                else{
+                    _authState.value = AuthState.Loading
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val user = auth.currentUser
+                                user?.let{
+                                    it.updateProfile(userProfileChangeRequest {
+                                        displayName = pseudo
+                                    }).addOnCompleteListener{profileTask ->
+                                        if(profileTask.isSuccessful){
+                                            saveUserToFirestore(it.uid,username, pseudo, email)
+                                        } else {
+                                            _authState.value = AuthState.Error(profileTask.exception?.message ?: "l'update a foiré mgl")
+                                        }
+                                    }
+                                }
+                                _authState.value = AuthState.Authenticated
                             } else {
-                                _authState.value = AuthState.Error(profileTask.exception?.message ?: "l'update a foiré mgl")
+                                _authState.value = AuthState.Error(task.exception?.message ?: "c'est la D")
                             }
                         }
-                    }
-                    _authState.value = AuthState.Authenticated
-                } else {
-                    _authState.value = AuthState.Error(task.exception?.message ?: "c'est la D")
                 }
             }
     }
 
-    private fun saveUserToFirestore(uid: String, pseudo: String, email: String) {
+    private fun saveUserToFirestore(uid: String,username:String, pseudo: String, email: String) {
         val user = hashMapOf(
             "uid" to uid,
+            "username" to username,
             "pseudo" to pseudo,
             "email" to email,
             "createdAt" to System.currentTimeMillis()

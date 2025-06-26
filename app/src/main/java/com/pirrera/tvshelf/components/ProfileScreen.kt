@@ -86,13 +86,31 @@ fun ProfileScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel
     val user = Firebase.auth.currentUser
     val userId = user?.uid
     val pseudo = remember { mutableStateOf(user?.displayName ?: "oula") }
+    val username = remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        user?.uid?.let { uid ->
+            FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        username.value = document.getString("username") ?: ""
+                    }
+                }
+                .addOnFailureListener {
+                    username.value = "Erreur"
+                }
+        }
+    }
 
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
     ) {
 
-        User(pseudo.value)
+        User(pseudo.value,username.value)
         HorizontalDivider(
             color = Secondary,
             thickness = 1.dp,
@@ -154,7 +172,7 @@ fun ProfileScreen(navigator: DestinationsNavigator, authViewModel: AuthViewModel
 }
 
 @Composable
-fun User(pseudo: String) {
+fun User(pseudo: String, username : String) {
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
@@ -217,7 +235,7 @@ val imagePickerLauncher = rememberLauncherForActivityResult(
             )
 
             Text(
-                text = "@username",
+                text = username,
                 color = Color.White,
                 fontSize = 16.sp
             )
